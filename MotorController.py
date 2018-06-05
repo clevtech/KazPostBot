@@ -39,7 +39,7 @@ class MotorController:
     def steer_right(self):
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_encoder(7)
+        self._wait_encoder(-7)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
 
