@@ -32,14 +32,14 @@ class MotorController:
     def steer_left(self):
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        self._wait_encoder(7)
+        self._wait_encoder(1100)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         
     def steer_right(self):
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_encoder(-7)
+        self._wait_encoder(-1100)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
 
@@ -81,7 +81,6 @@ class MotorController:
             self.encoder_last_B = b_state
             if math.fabs(self.encoder_value - until) <= tolerance:
                 return
-            time.sleep(0.01)
 
         
 if __name__ == '__main__':
