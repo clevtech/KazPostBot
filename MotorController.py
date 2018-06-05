@@ -44,7 +44,18 @@ class MotorController:
         self.steer_motor[1].off()
 
     def steer_middle(self):
-        return
+        if self.encoder_value < 0:
+            self.steer_motor[0].on()
+            self.steer_motor[1].off()
+            self._wait_encoder(0)
+            self.steer_motor[0].off()
+            self.steer_motor[1].off()
+        else:
+            self.steer_motor[0].off()
+            self.steer_motor[1].on()
+            self._wait_encoder(0)
+            self.steer_motor[0].off()
+            self.steer_motor[1].off()
         
     def stop(self):
         self.front_motor[0].off()
@@ -86,6 +97,12 @@ class MotorController:
 if __name__ == '__main__':
     control = MotorController()
     control.steer_right()
+    time.sleep(3)
+    control.steer_middle()
+    time.sleep(3)
+    control.steer_left()
+    time.sleep(3)
+    control.steer_middle()
 ##    control.backward()
 ##    time.sleep(0.8)
 ##    control.stop()
