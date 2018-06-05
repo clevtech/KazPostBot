@@ -56,25 +56,25 @@ class MotorController:
         while True:
             a_state = GPIO.input(self.encoder_A)
             b_state = GPIO.input(self.encoder_B)
-            if self.encoder_last_A is False and self.encoder_last_B is False:
-                if a_state is True and b_state is False:
+            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
+                if a_state == 1 and b_state == 0:
                     self.encoder_value += 1
-                elif a_state is False and b_state is True:
+                elif a_state == 0 and b_state == 1:
                     self.encoder_value -= 1
-            elif self.encoder_last_A is False and self.encoder_last_B is True:
-                if a_state is False and b_state is False:
+            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
+                if a_state == 0 and b_state == 0:
                     self.encoder_value += 1
-                elif a_state is True and b_state is True:
+                elif a_state == 1 and b_state == 1:
                     self.encoder_value -= 1
-            elif self.encoder_last_A is True and self.encoder_last_B is False:
-                if a_state is True and b_state is True:
+            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
+                if a_state == 1 and b_state == 1:
                     self.encoder_value += 1
-                elif a_state is False and b_state is False:
+                elif a_state == 0 and b_state == 0:
                     self.encoder_value -= 1
-            elif self.encoder_last_A is True and self.encoder_last_B is True:
-                if a_state is False and b_state is True:
+            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
+                if a_state == 0 and b_state == 1:
                     self.encoder_value += 1
-                elif a_state is True and b_state is False:
+                elif a_state == 1 and b_state == 0:
                     self.encoder_value -= 1
             print(self.encoder_value)
             self.encoder_last_A = a_state
