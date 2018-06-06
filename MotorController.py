@@ -1,24 +1,15 @@
 import time
 import math
 from gpiozero import LED
-from RPi import GPIO
 from Webcam import Webcam
 import cv2
 import numpy as np
 
 class MotorController:
     def __init__(self):
-##        self.encoder_A = 17
-##        self.encoder_B = 18
         self.front_motor = (LED(21), LED(20))
         self.back_motor = (LED(19), LED(26))
         self.steer_motor = (LED(23), LED(24))
-        GPIO.setmode(GPIO.BCM)
-##        GPIO.setup(self.encoder_A, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-##        GPIO.setup(self.encoder_B, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        
-##        self.encoder_last_A = GPIO.input(self.encoder_A)
-##        self.encoder_last_B = GPIO.input(self.encoder_B)
         self.camera = Webcam()
         
     def forward(self):
@@ -127,9 +118,11 @@ class MotorController:
         
 if __name__ == '__main__':
     control = MotorController()
-    control.steer_right()
-    time.sleep(2)
-    control.steer_middle()
+    control.back_motor[0].on()
+    control.back_motor[1].off()
+    # control.steer_right()
+    # time.sleep(2)
+    # control.steer_middle()
 ##    time.sleep(2)
 ##    control.steer_right()
 ##    time.sleep(2)
