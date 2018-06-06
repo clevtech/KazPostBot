@@ -2,7 +2,7 @@ import cv2
 
 
 class Webcam:
-    def __init__(self, width=200, height=50):
+    def __init__(self, width=300, height=150):
         self.video_capture = cv2.VideoCapture(0)
         self.video_capture.set(3, width)
         self.video_capture.set(4, height)
@@ -13,5 +13,5 @@ class Webcam:
         self.height = frame.shape[0]
 
     def get_current_frame(self):
-        return self.video_capture.read()[1]
+        return self.video_capture.read()[1][self.width / 2 - 15:self.width / 2 - 14, :]
 

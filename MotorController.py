@@ -4,6 +4,7 @@ from gpiozero import LED
 from RPi import GPIO
 from Webcam import Webcam
 import cv2
+import numpy as np
 
 class MotorController:
     def __init__(self):
@@ -97,10 +98,18 @@ class MotorController:
                 return
 
     def _wait_camera(self, until):
+        def gamma_correction(frame, power):
+            frame = frame / 255.0
+            frame = cv2.pow(frame, power)
+            return np.uint8(frame * 255)
         while True:
             frame = self.camera.get_current_frame()
-            cv2.imshow('asd', frame)
-            cv2.waitKey(0)
+            gamma = gamma_correction(frame, 3)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+            np.argmax(thresh, axis=1).squeeze()
+            cv2.imshow('asd', thresh)
+            cv2.waitKey(1)
 
         
 if __name__ == '__main__':
