@@ -2,6 +2,8 @@ import time
 import math
 from gpiozero import LED
 from RPi import GPIO
+from Webcam import Webcam
+import cv2
 
 class MotorController:
     def __init__(self):
@@ -16,6 +18,7 @@ class MotorController:
         self.encoder_value = 0
         self.encoder_last_A = GPIO.input(self.encoder_A)
         self.encoder_last_B = GPIO.input(self.encoder_B)
+        self.camera = Webcam()
         
     def forward(self):
         self.front_motor[0].off()
@@ -93,16 +96,16 @@ class MotorController:
             if math.fabs(self.encoder_value - until) <= tolerance:
                 return
 
+    def _wait_camera(self, until):
+        while True:
+            frame = self.camera.get_current_frame()
+            cv2.imshow('asd', frame)
+            cv2.waitKey(0)
+
         
 if __name__ == '__main__':
     control = MotorController()
-    control.steer_right()
-    time.sleep(3)
-    control.steer_middle()
-    time.sleep(3)
-    control.steer_left()
-    time.sleep(3)
-    control.steer_middle()
+    control._wait_camera(2)
 ##    control.backward()
 ##    time.sleep(0.8)
 ##    control.stop()
