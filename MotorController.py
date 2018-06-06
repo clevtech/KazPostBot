@@ -36,22 +36,22 @@ class MotorController:
     def steer_left(self):
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        self._wait_encoder(1100)
+        self._wait_camera(50)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         
     def steer_right(self):
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_encoder(-1100)
+        self._wait_camera(100)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
 
     def steer_middle(self):
-        if self.encoder_value < 0:
+        if self.encoder_value < 77:
             self.steer_motor[0].on()
             self.steer_motor[1].off()
-            self._wait_encoder(0)
+            self._wait_camera(77)
             self.steer_motor[0].off()
             self.steer_motor[1].off()
         else:
@@ -97,7 +97,7 @@ class MotorController:
             if math.fabs(self.encoder_value - until) <= tolerance:
                 return
 
-    def _wait_camera(self, until):
+    def _wait_camera(self, until, tolerance=3):
         def gamma_correction(frame, power):
             frame = frame / 255.0
             frame = cv2.pow(frame, power)
@@ -105,16 +105,17 @@ class MotorController:
         while True:
             frame = self.camera.get_current_frame()
             gamma = gamma_correction(frame, 3)
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(gamma, cv2.COLOR_BGR2GRAY)
             _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-            np.argmax(thresh, axis=1).squeeze()
-            cv2.imshow('asd', thresh)
-            cv2.waitKey(1)
+            reading = np.argmax(thresh, axis=1).squeeze()
+            print(reading)
+            if math.fabs(reading - until) <= tolerance:
+                return
 
         
 if __name__ == '__main__':
     control = MotorController()
-    control._wait_camera(2)
+    control.steer_left()
 ##    control.backward()
 ##    time.sleep(0.8)
 ##    control.stop()
