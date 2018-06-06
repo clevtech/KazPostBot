@@ -11,6 +11,7 @@ class MotorController:
         self.back_motor = (LED(19), LED(26))
         self.steer_motor = (LED(23), LED(24))
         self.camera = Webcam()
+        self.turn_in_process = False
         
     def forward(self):
         self.front_motor[0].off()
@@ -25,22 +26,31 @@ class MotorController:
         self.back_motor[1].off()
         
     def steer_left(self):
+        self.turn_in_process = False
+        time.sleep(0.01)
+        self.turn_in_process = True
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        self._wait_camera(34)
+        self._wait_camera(50)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
-        time.sleep(0.5)
+        self.turn_in_process = False
         
     def steer_right(self):
+        self.turn_in_process = False
+        time.sleep(0.01)
+        self.turn_in_process = True
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_camera(135)
+        self._wait_camera(130)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
-        time.sleep(0.5)
+        self.turn_in_process = False
 
     def steer_middle(self):
+        self.turn_in_process = False
+        time.sleep(0.01)
+        self.turn_in_process = True
         if self._get_reading() < 77:
             self.steer_motor[0].off()
             self.steer_motor[1].on()
@@ -50,7 +60,7 @@ class MotorController:
         else:
             self.steer_motor[0].on()
             self.steer_motor[1].off()
-            self._wait_camera(85)
+            self._wait_camera(70)
             self.steer_motor[0].off()
             self.steer_motor[1].off()
         
@@ -102,24 +112,20 @@ class MotorController:
             frame = frame / 255.0
             frame = cv2.pow(frame, power)
             return np.uint8(frame * 255)
-        while True:
+        while self.turn_in_process:
             frame = self.camera.get_current_frame()
 ##            gamma = gamma_correction(frame, 3)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-            cv2.imshow('asd', thresh)
-            cv2.waitKey(1)
             reading = np.argmax(thresh, axis=1).squeeze()
-            print(reading)
-            print(math.fabs(reading - until))
             if math.fabs(reading - until) <= tolerance:
                 return
-
         
 if __name__ == '__main__':
     control = MotorController()
-    control.back_motor[0].on()
-    control.back_motor[1].off()
+    control.forward()
+    time.sleep(1.5)
+    control.stop()
     # control.steer_right()
     # time.sleep(2)
     # control.steer_middle()
