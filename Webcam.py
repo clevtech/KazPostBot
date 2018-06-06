@@ -13,5 +13,5 @@ class Webcam:
         self.height = frame.shape[0]
 
     def get_current_frame(self):
-        return self.video_capture.read()[1][self.width / 2 - 15:self.width / 2 - 14, :]
+        return self.video_capture.read()[1][self.width / 2 - 28:self.width / 2 - 27, :]
 
