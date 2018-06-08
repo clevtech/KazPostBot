@@ -5,10 +5,17 @@ from Webcam import Webcam
 import cv2
 import numpy as np
 
+
+def gamma_correction(frame, power):
+    frame = frame / 255.0
+    frame = cv2.pow(frame, power)
+    return np.uint8(frame * 255)
+
+
 class MotorController:
     def __init__(self):
         self.front_motor = (LED(21), LED(20))
-        self.back_motor = (LED(19), LED(26))
+        self.back_motor = (LED(26), LED(19))
         self.steer_motor = (LED(23), LED(24))
         self.camera = Webcam()
         self.turn_in_process = False
@@ -31,7 +38,7 @@ class MotorController:
         self.turn_in_process = True
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        self._wait_camera(50)
+        self._wait_camera(30)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         self.turn_in_process = False
@@ -42,7 +49,7 @@ class MotorController:
         self.turn_in_process = True
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_camera(130)
+        self._wait_camera(135)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         self.turn_in_process = False
@@ -51,18 +58,22 @@ class MotorController:
         self.turn_in_process = False
         time.sleep(0.01)
         self.turn_in_process = True
+        print('started')
         if self._get_reading() < 77:
             self.steer_motor[0].off()
             self.steer_motor[1].on()
-            self._wait_camera(85)
+            self._wait_camera(60)
+            print('1 waited')
             self.steer_motor[0].off()
             self.steer_motor[1].off()
         else:
             self.steer_motor[0].on()
             self.steer_motor[1].off()
-            self._wait_camera(70)
+            self._wait_camera(85)
+            print('2 waited')
             self.steer_motor[0].off()
             self.steer_motor[1].off()
+        self.turn_in_process = False
         
     def stop(self):
         self.front_motor[0].off()
@@ -70,75 +81,39 @@ class MotorController:
         self.back_motor[0].off()
         self.back_motor[1].off()
 
-##    def _wait_encoder(self, until, tolerance=5):
-##        while True:
-##            a_state = GPIO.input(self.encoder_A)
-##            b_state = GPIO.input(self.encoder_B)
-##            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
-##                if a_state == 1 and b_state == 0:
-##                    self.encoder_value += 1
-##                elif a_state == 0 and b_state == 1:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
-##                if a_state == 0 and b_state == 0:
-##                    self.encoder_value += 1
-##                elif a_state == 1 and b_state == 1:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
-##                if a_state == 1 and b_state == 1:
-##                    self.encoder_value += 1
-##                elif a_state == 0 and b_state == 0:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
-##                if a_state == 0 and b_state == 1:
-##                    self.encoder_value += 1
-##                elif a_state == 1 and b_state == 0:
-##                    self.encoder_value -= 1
-##            print(self.encoder_value)
-##            self.encoder_last_A = a_state
-##            self.encoder_last_B = b_state
-##            if math.fabs(self.encoder_value - until) <= tolerance:
-##                return
-
     def _get_reading(self):
         frame = self.camera.get_current_frame()
-        ##            gamma = gamma_correction(frame, 3)
+        gamma = gamma_correction(frame, 2)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-        return np.argmax(thresh, axis=1).squeeze()
+        thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 2)
+        indexes = np.where(thresh.squeeze() == 0)[0]
+        reading = int(np.median(indexes))
+        return reading
 
     def _wait_camera(self, until, tolerance=10):
-        def gamma_correction(frame, power):
-            frame = frame / 255.0
-            frame = cv2.pow(frame, power)
-            return np.uint8(frame * 255)
         while self.turn_in_process:
             frame = self.camera.get_current_frame()
-##            gamma = gamma_correction(frame, 3)
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
-            reading = np.argmax(thresh, axis=1).squeeze()
+            gamma = gamma_correction(frame, 2)
+            gray = cv2.cvtColor(gamma, cv2.COLOR_BGR2GRAY)
+            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 2)
+            cv2.imshow('frame', self._stripe_to_show(thresh))
+            cv2.waitKey(1)
+            indexes = np.where(thresh.squeeze() == 0)[0]
+            reading = int(np.median(indexes))
+            print(reading)
             if math.fabs(reading - until) <= tolerance:
                 return
+            
+    def _stripe_to_show(self, stripe):
+        stripe = stripe.reshape((1, -1))
+        new_im = stripe
+        for i in range(7):
+            new_im = np.vstack((new_im, new_im))
+        return new_im
         
 if __name__ == '__main__':
     control = MotorController()
-    control.forward()
-    time.sleep(1.5)
-    control.stop()
-    # control.steer_right()
-    # time.sleep(2)
-    # control.steer_middle()
-##    time.sleep(2)
+    control.steer_left()
 ##    control.steer_right()
-##    time.sleep(2)
-##    control.steer_middle()
-##    control._wait_camera(200)
-##    control.backward()
-##    time.sleep(0.8)
-##    control.stop()
-##    control.forward()
-##    time.sleep(0.8)
-##    control.stop()
 ##    control.steer_left()
 ##    control.steer_right()
