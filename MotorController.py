@@ -49,7 +49,7 @@ class MotorController:
         self.turn_in_process = True
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        self._wait_camera(135)
+        self._wait_camera(120)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         self.turn_in_process = False
@@ -59,17 +59,17 @@ class MotorController:
         time.sleep(0.01)
         self.turn_in_process = True
         print('started')
-        if self._get_reading() < 77:
+        if self._get_reading() < 80:
             self.steer_motor[0].off()
             self.steer_motor[1].on()
-            self._wait_camera(60)
+            self._wait_camera(79)
             print('1 waited')
             self.steer_motor[0].off()
             self.steer_motor[1].off()
         else:
             self.steer_motor[0].on()
             self.steer_motor[1].off()
-            self._wait_camera(85)
+            self._wait_camera(88)
             print('2 waited')
             self.steer_motor[0].off()
             self.steer_motor[1].off()
@@ -113,7 +113,8 @@ class MotorController:
         
 if __name__ == '__main__':
     control = MotorController()
-    control.steer_left()
+    control.steer_right()
+    control.steer_middle()
 ##    control.steer_right()
 ##    control.steer_left()
 ##    control.steer_right()
