@@ -10,6 +10,7 @@ __status__ = "Development"
 
 
 import telepot, socket
+import json
 
 """
 Cheat sheet of Bauyrzhan Ospan.
@@ -35,4 +36,15 @@ def get_ip():
     finally:
         s.close()
     return IP
+
+
+def write_json(data, name):
+    with open(name, 'w') as outfile:
+        json.dump(data, outfile)
+
+
+def read_json(name):
+    with open(name, 'r') as f:
+        return json.load(f)
+
 

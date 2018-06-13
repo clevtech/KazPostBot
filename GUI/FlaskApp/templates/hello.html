@@ -57,36 +57,35 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
     font-weight: bold;
 	font-family: "Open Sans", sans-serif;
 }
+table {border: none;
+        text-align: center;
+        padding: 35px;
+}
 </style>
 <body class="w3-theme-l5">
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:20px">
   <!-- The Grid -->
   <div class="w3-row">
-    <!-- Left Column -->
-    <div class="w3-col m4">
-      <!-- Alert Box -->
-      <div class="w3-container w3-display-container backy">
-        <span onclick="this.parentElement.style.display='none'" class="w3-button fronty">
-          <i class="fa fa-remove"></i>
-        </span>
-        <p>{{alert}}</p>
-      </div>
-
-    <!-- End Left Column -->
-    </div>
 
     <!-- Middle Column -->
-    <div class="w3-col m7">
+    <div class="w3-col m12">
 
       <div class="w3-row-padding">
         <div class="w3-col m12">
           <div class="w3-card w3-white">
-            <div class="w3-container w3-padding">
-              <form action="/pass/" method="POST">
-              <p><input type="password" contenteditable="true" class="input1" pattern="[0-9]*" inputmode="numeric" name="passcode" placeholder="Введите пароль"/><img src="https://post.kz/react/static/media/saver.708102fc.svg" width="20%" align="right"></p>
-              <br><input type="submit" class="button1" name="my-form" value="Принять"/>
-           	</form>
+            <a class="w3-container w3-padding">
+                <table cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <p><h2>Робот почтальон - робот по доставке почты</h2>
+                            <br><a class="button1" href="/login/">Войти в кабинет</a>
+                        </td>
+                        <td>
+                            <img src="https://image.flaticon.com/icons/svg/631/631279.svg" width="100%" align="right">
+                        </td>
+                    </tr>
+                </table>
             </div>
           </div>
         </div>

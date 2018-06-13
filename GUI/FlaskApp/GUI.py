@@ -30,19 +30,72 @@ def read_config():
     return ids, passcode
 
 
+# Hello page
+@app.route("/")  # Root for hello page is index "/"
+def hello():
+    return render_template(
+        "hello.html", **locals())
+
+
+# Choosing cell to load
+@app.route("/robot/")  # Root for hello page is index "/"
+def robot():
+    alert = "Выберите ячейку"
+    file = "cells.json"
+    cell = naboox.read_json(file)
+    for i in range(len(cell)):
+        for j in range(len(cell[i])):
+            if cell[i][j] == 1:
+                value = "Занято"
+            else:
+                value = "Свободно"
+            exec("cell" + str(j) + str(i) + " = '" + value + "'")
+
+    return render_template(
+        "robot.html", **locals())
+
+
+# ID to cells
+# TODO: Баг! Непонятно, но не пишет в json
+@app.route("/robot/<cellN>", methods=["GET", "POST"])
+def cellz(cellN):
+    alert = "Введите идентификационный номер клиента"
+    i = int(cellN[4])
+    j = int(cellN[5])
+    data = [[0, 0], [0, 0], [0, 0], [0, 0]]
+    if request.method == 'POST':  # If user POST by clicking submit button any text
+        ID = request.form['id']
+        data[int(j)][int(i)] = ID
+        naboox.write_json(data, "cells_ID.json")
+        alert = "Выберите ячейку"
+        file = "cells.json"
+        cell = naboox.read_json(file)
+        for i in range(len(cell)):
+            for j in range(len(cell[i])):
+                if cell[i][j] == 1:
+                    value = "Занято"
+                else:
+                    value = "Свободно"
+                exec("cell" + str(j) + str(i) + " = '" + value + "'")
+
+        return render_template(
+            "robot.html", **locals())
+    return render_template(
+        "cell.html", **locals())
+
+
 # Login page, no authorisation with password
-# TODO: create hello page with logo of the robot and login button
-@app.route("/")  # Root for login page is index "/"
+@app.route("/login/")
 def login():
     alert = "Введите пароль"
     return render_template(
         "login.html", **locals())
 
 
-# Login page, no authorisation with password
+# Checking passcode
 # TODO: Go to page of loading post
-@app.route("/pass/", methods=["POST"])  # Root for login page is index "/"
-def login2():
+@app.route("/pass/", methods=["POST"])
+def passngo():
     alert = "Введите пароль"
     passcode = request.form['passcode']
     ids, truepass = read_config()
@@ -59,9 +112,15 @@ def login2():
             "login.html", **locals())
 
 
+def setup_all():
+    data = [[0, 0], [0, 0], [0, 0], [0, 0]]
+    naboox.write_json(data, "cells.json")
+    naboox.write_json(data, "cells_ID.json")
+
+
 # Main flask app
 if __name__ == "__main__":
-
+    setup_all()
     # It creates application in special IP
     app.run(host=naboox.get_ip(), port=8090, debug=True)
 
