@@ -1,0 +1,7 @@
+# Write ID of users (newline for each user):
+id: 274271705
+
+# Write passcode to enter to the interface (only numbers):
+passcode: 7788
+
+
