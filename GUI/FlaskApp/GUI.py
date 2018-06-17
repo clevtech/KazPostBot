@@ -11,7 +11,7 @@ __status__ = "Development"
 from flask import Flask, render_template, request, Markup
 import time
 import naboox.main as naboox
-import random
+import random, pprint
 
 
 app = Flask(__name__)  # Creating new flask app
@@ -22,6 +22,18 @@ def setup_all():
     data = [[0, 0, 0, 0], [0, 0, 0, 0]]
     naboox.write_json(data, "cells_ID.json")
     naboox.write_json(data, "cells_PIN.json")
+    naboox.write_json(None, "timer.json")
+
+
+def check_time():
+    timer1 = naboox.read_json("timer.json")
+    elapsed_time = time.time() - timer1
+    ids, passcode, timer = read_config()
+    if timer1 > timer:
+        return True
+    else:
+        return False
+
 
 
 def make_PIN():
@@ -29,6 +41,8 @@ def make_PIN():
     PIN = random.sample(range(1000, 9999), 8)
     PIN = [PIN[0:4], PIN[4:8]]
     naboox.write_json(PIN, "cells_PIN.json")
+    start_time = time.time()
+    naboox.write_json(start_time, "timer.json")
 
 
 def read_config():
@@ -42,8 +56,10 @@ def read_config():
             passcode = line.replace('\n', '').replace('\r', '').replace(" ", "").replace("passcode:", '')
         if line[0:3] == "id:":
             ids.append(line.replace('\n', '').replace('\r', '').replace(" ", "").replace("id:", ''))
+        if line[0:9] == "timer:":
+            timer = line.replace('\n', '').replace('\r', '').replace(" ", "").replace("timer:", '')
 
-    return ids, passcode
+    return ids, passcode, timer
 
 
 # Hello page
@@ -88,7 +104,6 @@ def robot():
 
 
 # ID to cells
-# TODO: Баг! Непонятно, но не пишет в json
 @app.route("/robot/<cellN>", methods=["GET", "POST"])
 def cellz(cellN):
     alert = "Введите номер мобильного телефона клиента"
@@ -127,19 +142,33 @@ def login():
 # Login page, no authorisation with password
 @app.route("/send/", methods=["GET", "POST"])
 def send():
+    make_PIN()
     time.sleep(20)
-    # Едет до чего-то
-    # Отправляет СМС
-    # Создает ПИН коды
-    alert = "Введите пароль от посылки из СМС"
+    if check_time():
+        return render_template(
+            "home.html", **locals())
+    # TODO:  Едет до чего-то
+    # TODO: Отправляет СМС
+    alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
+    if request.method == 'POST':  # If user POST by clicking submit button any text
+        PIN = request.form['passcode']
+        file = "cells_PIN.json"
+        passc = naboox.read_json(file)
+        file = "cells_ID.json"
+        cell = naboox.read_json(file)
+        for i in range(len(passc)):
+            for j in range(len(passc[i])):
+                if PIN == passc[i][j]:
+                    # TODO: Открой ячейку с этим номером
+                    cell[i][j] = 0
+                    naboox.write_json(cell, "cells_ID.json")
     return render_template(
         "pin.html", **locals())
 
 
 # Main flask app
 if __name__ == "__main__":
-    make_PIN()
-    # setup_all()
-    # # It creates application in special IP
-    # app.run(host=naboox.get_ip(), port=7777, debug=True)
+    setup_all()
+    # It creates application in special IP
+    app.run(host=naboox.get_ip(), port=7777, debug=True)
 

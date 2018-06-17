@@ -4,4 +4,5 @@ id: 274271705
 # Write passcode to enter to the interface (only numbers):
 passcode: 7788
 
-
+# Write time to wait (only numbers in sec):
+timer: 3600
