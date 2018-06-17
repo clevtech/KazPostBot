@@ -1,0 +1,16 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://webservices.kazpost.kz/altsmsgate/schema">
+   <soapenv:Header/>
+   <soapenv:Body>
+<sch:SendRequest> <sch:Authentication>
+<sch:UserName>test111</sch:UserName>
+<sch:Password>test111</sch:Password> </sch:Authentication>
+ <sch:SmsList>
+     <!--1 to 100 repetitions:--> <sch:Sms>
+            <sch:SmsText>Test it!</sch:SmsText>
+            <sch:PhoneNumber>87081993506</sch:PhoneNumber>
+            <sch:MessageType>0</sch:MessageType>
+            </sch:Sms>
+         </sch:SmsList>
+      </sch:SendRequest>
+   </soapenv:Body>
+</soapenv:Envelope>

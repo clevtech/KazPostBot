@@ -114,6 +114,13 @@ table {
 	background-color: #FFB800;
 }
 </style>
+<script>
+    function boom() {
+      document.getElementById("al").innerHTML = 'Выполняется отправка...'
+      document.getElementById("sexy").innerHTML = '<center><p><img src="/static/loadingimage.gif"></center></p>'
+      window.location.href = '/send/';
+    }
+  </script>
 <body class="w3-theme-l5">
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:20px">
@@ -126,14 +133,14 @@ table {
         <span onclick="this.parentElement.style.display='none'" class="w3-button fronty">
           <i class="fa fa-remove"></i>
         </span>
-        <p>{{alert}}</p>
+        <p id="al">{{alert}}</p>
       </div>
 
     <!-- End Left Column -->
     </div>
 
     <!-- Middle Column -->
-    <div class="w3-col m7">
+    <div class="w3-col m7" id="sexy">
 
       <div class="w3-row-padding">
         <div class="w3-col m12">
@@ -173,7 +180,9 @@ table {
                         </td>
                     </tr>
                 </table></center>
-              <br><a class="button1" href="/send/">Отправить</a><a class="button2" href="../">Отменить</a>
+              <br>
+                <button class="button1" type="button" onclick='boom();'>Отправить</button>
+                <a class="button2" href="../">Отменить</a>
             </div>
           </div>
         </div>
@@ -186,7 +195,6 @@ table {
 <!-- End Page Container -->
 </div>
 <br>
-
 
 </body>
 </html>

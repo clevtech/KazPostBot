@@ -9,10 +9,26 @@ __email__ = "bospan@cleverest.tech"
 __status__ = "Development"
 
 from flask import Flask, render_template, request, Markup
+import time
 import naboox.main as naboox
+import random
 
 
 app = Flask(__name__)  # Creating new flask app
+
+
+
+def setup_all():
+    data = [[0, 0, 0, 0], [0, 0, 0, 0]]
+    naboox.write_json(data, "cells_ID.json")
+    naboox.write_json(data, "cells_PIN.json")
+
+
+def make_PIN():
+
+    PIN = random.sample(range(1000, 9999), 8)
+    PIN = [PIN[0:4], PIN[4:8]]
+    naboox.write_json(PIN, "cells_PIN.json")
 
 
 def read_config():
@@ -38,19 +54,35 @@ def hello():
 
 
 # Choosing cell to load
-@app.route("/robot/")  # Root for hello page is index "/"
+@app.route("/robot/", methods=["GET", "POST"])  # Root for hello page is index "/"
 def robot():
     alert = "Выберите ячейку"
-    file = "cells.json"
+    file = "cells_ID.json"
     cell = naboox.read_json(file)
+
     for i in range(len(cell)):
         for j in range(len(cell[i])):
-            if cell[i][j] == 1:
+            if cell[i][j] != 0:
                 value = "Занято"
             else:
                 value = "Свободно"
-            exec("cell" + str(j) + str(i) + " = '" + value + "'")
+            command = "cell" + str(i) + str(j) + " = '" + value + "'"
+            exec(command)
 
+    if request.method == "POST":
+        passcode = request.form['passcode']
+        ids, truepass = read_config()
+        if passcode == truepass:
+            msg = "Кто-то зашел в кабинет"
+            naboox.send_tlg_msg(msg, ids)
+            return render_template(
+                "robot.html", **locals())
+        else:
+            alert = "Вы ввели неправильный пароль"
+            msg = "Кто-то пытался зайти в кабинет, используя неправильный пароль"
+            naboox.send_tlg_msg(msg, ids)
+            return render_template(
+                "login.html", **locals())
     return render_template(
         "robot.html", **locals())
 
@@ -59,24 +91,24 @@ def robot():
 # TODO: Баг! Непонятно, но не пишет в json
 @app.route("/robot/<cellN>", methods=["GET", "POST"])
 def cellz(cellN):
-    alert = "Введите идентификационный номер клиента"
+    alert = "Введите номер мобильного телефона клиента"
     i = int(cellN[4])
     j = int(cellN[5])
-    data = [[0, 0], [0, 0], [0, 0], [0, 0]]
     if request.method == 'POST':  # If user POST by clicking submit button any text
         ID = request.form['id']
-        data[int(j)][int(i)] = ID
-        naboox.write_json(data, "cells_ID.json")
+        file = "cells_ID.json"
+        data = naboox.read_json(file)
+        data[int(i)][int(j)] = ID
+        naboox.write_json(data, file)
         alert = "Выберите ячейку"
-        file = "cells.json"
         cell = naboox.read_json(file)
         for i in range(len(cell)):
             for j in range(len(cell[i])):
-                if cell[i][j] == 1:
+                if cell[i][j] != 0:
                     value = "Занято"
                 else:
                     value = "Свободно"
-                exec("cell" + str(j) + str(i) + " = '" + value + "'")
+                exec("cell" + str(i) + str(j) + " = '" + value + "'")
 
         return render_template(
             "robot.html", **locals())
@@ -92,35 +124,22 @@ def login():
         "login.html", **locals())
 
 
-# Checking passcode
-# TODO: Go to page of loading post
-@app.route("/pass/", methods=["POST"])
-def passngo():
-    alert = "Введите пароль"
-    passcode = request.form['passcode']
-    ids, truepass = read_config()
-    if passcode == truepass:
-        msg = "Кто-то зашел в кабинет"
-        naboox.send_tlg_msg(msg, ids)
-        return render_template(
-            "login.html", **locals())
-    else:
-        alert = "Вы ввели неправильный пароль"
-        msg = "Кто-то пытался зайти в кабинет, используя неправильный пароль"
-        naboox.send_tlg_msg(msg, ids)
-        return render_template(
-            "login.html", **locals())
-
-
-def setup_all():
-    data = [[0, 0], [0, 0], [0, 0], [0, 0]]
-    naboox.write_json(data, "cells.json")
-    naboox.write_json(data, "cells_ID.json")
+# Login page, no authorisation with password
+@app.route("/send/", methods=["GET", "POST"])
+def send():
+    time.sleep(20)
+    # Едет до чего-то
+    # Отправляет СМС
+    # Создает ПИН коды
+    alert = "Введите пароль от посылки из СМС"
+    return render_template(
+        "pin.html", **locals())
 
 
 # Main flask app
 if __name__ == "__main__":
-    setup_all()
-    # It creates application in special IP
-    app.run(host=naboox.get_ip(), port=8090, debug=True)
+    make_PIN()
+    # setup_all()
+    # # It creates application in special IP
+    # app.run(host=naboox.get_ip(), port=7777, debug=True)
 
