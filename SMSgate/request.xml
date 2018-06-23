@@ -1,16 +1,16 @@
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sch="http://webservices.kazpost.kz/altsmsgate/schema">
-   <soapenv:Header/>
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sms="http://kazpost.kz/smsgate">
+<soapenv:Header>
+<soapenv:Username>test111</soapenv:Username>
+<soapenv:Password>test111</soapenv:Password>
+</soapenv:Header>
    <soapenv:Body>
-<sch:SendRequest> <sch:Authentication>
-<sch:UserName>test111</sch:UserName>
-<sch:Password>test111</sch:Password> </sch:Authentication>
- <sch:SmsList>
-     <!--1 to 100 repetitions:--> <sch:Sms>
-            <sch:SmsText>Test it!</sch:SmsText>
-            <sch:PhoneNumber>87081993506</sch:PhoneNumber>
-            <sch:MessageType>0</sch:MessageType>
-            </sch:Sms>
-         </sch:SmsList>
-      </sch:SendRequest>
+      <sms:sendUnicode>
+         <!--1 or more repetitions:-->
+         <element>
+            <phoneNumber>87081993506</phoneNumber>
+            <message>Робот почтальон принес Вашу посылку, он находится у входа Технопарка. Ваш ПИН: 5496</message>
+         </element>
+      </sms:sendUnicode>
    </soapenv:Body>
 </soapenv:Envelope>
