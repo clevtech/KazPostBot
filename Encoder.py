@@ -7,6 +7,7 @@ class Encoder:
         GPIO.setup(self.encoder[0], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(self.encoder[1], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         self.encoder_last_A, self.encoder_last_B, self.encoder_value, self.encoder_range = None, None, None, None
+##        self.encoder_last_A, self.encoder_last_B, self.encoder_value = GPIO.input(self.encoder[0]), GPIO.input(self.encoder[1]), 0
     
     def work_step(self):
         a_state = GPIO.input(self.encoder[0])
@@ -33,4 +34,10 @@ class Encoder:
                 self.encoder_value -= 1
         self.encoder_last_A = a_state
         self.encoder_last_B = b_state
-        
+
+
+if __name__ == "__main__":
+    enc = Encoder()
+    while 1:
+        enc.work_step()
+        print(enc.encoder_value)

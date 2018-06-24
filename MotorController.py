@@ -24,10 +24,13 @@ class MotorController:
         self.steer_motor = (LED(23), LED(24))
         self.stop()
         self.encoder = Encoder()
+##        self.encoder.encoder_last_A, self.encoder.encoder_last_B, self.encoder.encoder_value = GPIO.input(self.encoder.encoder[0]), GPIO.input(self.encoder.encoder[1]), 0
         self._calibrate_encoder()
         time.sleep(0.5)
         self.turn('mid')
-##        thread.start_new_thread(self._read_encoder(), ())
+        time.sleep(0.5)
+##        thread.start_new_thread(self._encoder_state(), ())
+##        time.sleep(30)
 ##        self.camera = Webcam()
 ##        self.sonic = UltraSonic()
         self.direction = 0
@@ -64,7 +67,7 @@ class MotorController:
     def _calibrate_encoder(self):
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        time.sleep(0.3)
+        time.sleep(0.7)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         time.sleep(1)
@@ -72,13 +75,13 @@ class MotorController:
         thread.start_new_thread(self._encoder_state, ())
         self.steer_motor[0].off()
         self.steer_motor[1].on()
-        time.sleep(0.3)
+        time.sleep(0.7)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         self.encoder.encoder_range = self.encoder.encoder_value
 ##        self.turn('mid')
     
-    def turn(self, goal, shift=200, tolerance=10):
+    def turn(self, goal, shift=0, tolerance=1):
         if goal == 'left': goal = shift
         elif goal == 'right': goal = self.encoder.encoder_range - shift
         elif goal == 'mid': goal = int(self.encoder.encoder_range / 2)
@@ -87,51 +90,51 @@ class MotorController:
             self.steer_motor[0].off()
             self.steer_motor[1].on()
             while math.fabs(self.encoder.encoder_value - goal) > tolerance:
-                time.sleep(0.01)
+                time.sleep(0.002)
             self.steer_motor[0].off()
             self.steer_motor[1].off()
         else:
             self.steer_motor[0].on()
             self.steer_motor[1].off()
             while math.fabs(self.encoder.encoder_value - goal) > tolerance:
-                time.sleep(0.01)
+                time.sleep(0.002)
             self.steer_motor[0].off()
             self.steer_motor[1].off()
 ##        print(self.encoder_value)
         
-    def _wait_encoder(self, until=None, delay=None, tolerance=1):
-        start = time.time()
-        while self.turn_in_process:
-            a_state = GPIO.input(self.encoder[0])
-            b_state = GPIO.input(self.encoder[1])
-            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
-                if a_state == 1 and b_state == 0:
-                    self.encoder_value += 1
-                elif a_state == 0 and b_state == 1:
-                    self.encoder_value -= 1
-            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
-                if a_state == 0 and b_state == 0:
-                    self.encoder_value += 1
-                elif a_state == 1 and b_state == 1:
-                    self.encoder_value -= 1
-            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
-                if a_state == 1 and b_state == 1:
-                    self.encoder_value += 1
-                elif a_state == 0 and b_state == 0:
-                    self.encoder_value -= 1
-            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
-                if a_state == 0 and b_state == 1:
-                    self.encoder_value += 1
-                elif a_state == 1 and b_state == 0:
-                    self.encoder_value -= 1
-            self.encoder_last_A = a_state
-            self.encoder_last_B = b_state
-            if delay is None:
-                if math.fabs(self.encoder_value - until) <= tolerance:
-                    return
-            else:
-                if math.fabs(time.time() - start) > delay:
-                    return
+##    def _wait_encoder(self, until=None, delay=None, tolerance=1):
+##        start = time.time()
+##        while self.turn_in_process:
+##            a_state = GPIO.input(self.encoder[0])
+##            b_state = GPIO.input(self.encoder[1])
+##            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
+##                if a_state == 1 and b_state == 0:
+##                    self.encoder_value += 1
+##                elif a_state == 0 and b_state == 1:
+##                    self.encoder_value -= 1
+##            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
+##                if a_state == 0 and b_state == 0:
+##                    self.encoder_value += 1
+##                elif a_state == 1 and b_state == 1:
+##                    self.encoder_value -= 1
+##            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
+##                if a_state == 1 and b_state == 1:
+##                    self.encoder_value += 1
+##                elif a_state == 0 and b_state == 0:
+##                    self.encoder_value -= 1
+##            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
+##                if a_state == 0 and b_state == 1:
+##                    self.encoder_value += 1
+##                elif a_state == 1 and b_state == 0:
+##                    self.encoder_value -= 1
+##            self.encoder_last_A = a_state
+##            self.encoder_last_B = b_state
+##            if delay is None:
+##                if math.fabs(self.encoder_value - until) <= tolerance:
+##                    return
+##            else:
+##                if math.fabs(time.time() - start) > delay:
+##                    return
 
         
 ##    def steer_left(self):
@@ -235,15 +238,15 @@ class MotorController:
         
 if __name__ == '__main__':
     control = MotorController()
-##    control.turn('left')
-##    time.sleep(1)
-##    control.turn('right')
-##    time.sleep(1)
-##    control.turn('mid')
-##    time.sleep(1)
-##    control.turn('left')
-##    time.sleep(1)
-##    control.turn('mid')
+    control.turn('left')
+    time.sleep(1)
+    control.turn('right')
+    time.sleep(1)
+    control.turn('mid')
+    time.sleep(1)
+    control.turn('left')
+    time.sleep(1)
+    control.turn('mid')
 ##    control.steer_right()
 ##    control.steer_left()
 ##    control.steer_right()
