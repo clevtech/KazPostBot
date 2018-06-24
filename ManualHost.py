@@ -1,7 +1,7 @@
 import socket
 
 class ManualHost:
-    def __init__(self, host='10.12.96.23', port=6666):
+    def __init__(self, host='10.12.96.39', port=6666):
         self.sock = socket.socket()
         self.sock.connect((host, port))
         

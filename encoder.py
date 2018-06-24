@@ -43,32 +43,32 @@ try:
 finally:
         GPIO.cleanup()
 
-##    def _wait_encoder(self, until, tolerance=5):
-##        while True:
-##            a_state = GPIO.input(self.encoder_A)
-##            b_state = GPIO.input(self.encoder_B)
-##            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
-##                if a_state == 1 and b_state == 0:
-##                    self.encoder_value += 1
-##                elif a_state == 0 and b_state == 1:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
-##                if a_state == 0 and b_state == 0:
-##                    self.encoder_value += 1
-##                elif a_state == 1 and b_state == 1:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
-##                if a_state == 1 and b_state == 1:
-##                    self.encoder_value += 1
-##                elif a_state == 0 and b_state == 0:
-##                    self.encoder_value -= 1
-##            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
-##                if a_state == 0 and b_state == 1:
-##                    self.encoder_value += 1
-##                elif a_state == 1 and b_state == 0:
-##                    self.encoder_value -= 1
-##            print(self.encoder_value)
-##            self.encoder_last_A = a_state
-##            self.encoder_last_B = b_state
-##            if math.fabs(self.encoder_value - until) <= tolerance:
-##                return
+    def _wait_encoder(self, until, tolerance=5):
+        while True:
+            a_state = GPIO.input(self.encoder_A)
+            b_state = GPIO.input(self.encoder_B)
+            if self.encoder_last_A == 0 and self.encoder_last_B == 0:
+                if a_state == 1 and b_state == 0:
+                    self.encoder_value += 1
+                elif a_state == 0 and b_state == 1:
+                    self.encoder_value -= 1
+            elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
+                if a_state == 0 and b_state == 0:
+                    self.encoder_value += 1
+                elif a_state == 1 and b_state == 1:
+                    self.encoder_value -= 1
+            elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
+                if a_state == 1 and b_state == 1:
+                    self.encoder_value += 1
+                elif a_state == 0 and b_state == 0:
+                    self.encoder_value -= 1
+            elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
+                if a_state == 0 and b_state == 1:
+                    self.encoder_value += 1
+                elif a_state == 1 and b_state == 0:
+                    self.encoder_value -= 1
+            print(self.encoder_value)
+            self.encoder_last_A = a_state
+            self.encoder_last_B = b_state
+            if math.fabs(self.encoder_value - until) <= tolerance:
+                return
