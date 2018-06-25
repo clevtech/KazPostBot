@@ -1,43 +1,19 @@
-from RPi import GPIO
+import serial, time
 
 class Encoder:
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        self.encoder = (10, 9)
-        GPIO.setup(self.encoder[0], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(self.encoder[1], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        self.encoder_last_A, self.encoder_last_B, self.encoder_value, self.encoder_range = None, None, None, None
-##        self.encoder_last_A, self.encoder_last_B, self.encoder_value = GPIO.input(self.encoder[0]), GPIO.input(self.encoder[1]), 0
+##        self.arduino = serial.Serial(port='/dev/ttyACM0', baudrate = 9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)       
+        self.arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+        self.left, self.mid, self.right = None, None, None
+        time.sleep(1)
     
-    def work_step(self):
-        a_state = GPIO.input(self.encoder[0])
-        b_state = GPIO.input(self.encoder[1])
-        if self.encoder_last_A == 0 and self.encoder_last_B == 0:
-            if a_state == 1 and b_state == 0:
-                self.encoder_value += 1
-            elif a_state == 0 and b_state == 1:
-                self.encoder_value -= 1
-        elif self.encoder_last_A == 0 and self.encoder_last_B == 1:
-            if a_state == 0 and b_state == 0:
-                self.encoder_value += 1
-            elif a_state == 1 and b_state == 1:
-                self.encoder_value -= 1
-        elif self.encoder_last_A == 1 and self.encoder_last_B == 0:
-            if a_state == 1 and b_state == 1:
-                self.encoder_value += 1
-            elif a_state == 0 and b_state == 0:
-                self.encoder_value -= 1
-        elif self.encoder_last_A == 1 and self.encoder_last_B == 1:
-            if a_state == 0 and b_state == 1:
-                self.encoder_value += 1
-            elif a_state == 1 and b_state == 0:
-                self.encoder_value -= 1
-        self.encoder_last_A = a_state
-        self.encoder_last_B = b_state
+    def get_reading(self):
+        self.arduino.write("1".encode('utf8'))
+        return int(float(self.arduino.readline()))
 
 
 if __name__ == "__main__":
     enc = Encoder()
-    while 1:
-        enc.work_step()
-        print(enc.encoder_value)
+    while True:
+        print(enc.get_reading())
+        time.sleep(0.2)

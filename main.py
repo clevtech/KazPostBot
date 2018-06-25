@@ -1,6 +1,6 @@
 from MotorController import MotorController
 from ManualHost import ManualHost
-import thread
+import thread, time
 
 control = MotorController()
 host = ManualHost()
@@ -8,6 +8,7 @@ host = ManualHost()
 ##cmd = None
 while True:
     cmd = host.read()
+    print(cmd)
     if cmd in ['Left is pressed', 'Right is pressed',
                'Up is pressed', 'Down is pressed',
                'Left is released', 'Right is released',
@@ -17,10 +18,8 @@ while True:
         elif cmd == 'Right is pressed':
             thread.start_new_thread(control.turn, ('right',))
         elif cmd == 'Up is pressed':
-            is_frw = True
             thread.start_new_thread(control.forward, ())
         elif cmd == 'Down is pressed':
-            is_frw = False
             thread.start_new_thread(control.backward, ())
         elif cmd == 'Left is released' or cmd == 'Right is released':
             thread.start_new_thread(control.turn, ('mid',))

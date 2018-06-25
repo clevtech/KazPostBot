@@ -10,7 +10,8 @@ from Encoder import Encoder
 
 
 class MotorController:
-    def __init__(self):     
+    def __init__(self):
+        self.calibrating = False
         GPIO.setmode(GPIO.BCM)
         self.front_motor = (LED(21), LED(20))
         self.back_motor = (LED(26), LED(19))
@@ -20,17 +21,6 @@ class MotorController:
         self.encoder = Encoder()
         self._calibrate_encoder()
         time.sleep(0.2)
-        self.turn('mid')
-        self.steer_state = 'mid'
-##        self.sonic = UltraSonic()
-        
-##        thread.start_new_thread(self._sonic_state, ())
-        
-    def _encoder_state(self):
-        while True:
-            self.encoder.work_step()
-            time.sleep(0.001)
-            print(self.encoder.encoder_value)
         
     def _sonic_state(self):
         while True:
@@ -40,6 +30,7 @@ class MotorController:
                 self.stop()
             elif self.direction == 2 and state == 'bck':
                 self.stop()
+            time.sleep(0.1)
         
     def forward(self):
         self.direction = 1
@@ -56,41 +47,51 @@ class MotorController:
         self.back_motor[1].off()
         
     def _calibrate_encoder(self):
+        self.calibrating = True
+        self.stop()
         self.steer_motor[0].on()
         self.steer_motor[1].off()
         time.sleep(1)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         time.sleep(0.2)
-        self.encoder.encoder_last_A, self.encoder.encoder_last_B, self.encoder.encoder_value = GPIO.input(self.encoder.encoder[0]), GPIO.input(self.encoder.encoder[1]), 0
-        thread.start_new_thread(self._encoder_state, ())
+        self.encoder.left = self.encoder.get_reading()
         self.steer_motor[0].off()
         self.steer_motor[1].on()
         time.sleep(1)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
-        self.encoder.encoder_range = self.encoder.encoder_value
+        self.encoder.right = self.encoder.get_reading()
+        self.encoder.mid = self.encoder.right / 2
+        self.calibrating = False
+        self.turn('mid')
     
-    def turn(self, goal, shift=0, tolerance=1):
-        if goal == 'left': val = shift
-        elif goal == 'right': val = self.encoder.encoder_range - shift
-        elif goal == 'mid': val = int(self.encoder.encoder_range / 2)
-        start_time = time.time()
-        while math.fabs(self.encoder.encoder_value - val) > tolerance and time.time() - start_time < 0.5:
-            if self.encoder.encoder_value < val:
-                self.steer_motor[0].off()
-                self.steer_motor[1].on()
-            else:
-                self.steer_motor[0].on()
-                self.steer_motor[1].off()
-            time.sleep(0.00001)
-        self.steer_motor[0].off()
-        self.steer_motor[1].off()
-        if goal == 'left':
-            self.steer_state = 'left'
-            self.encoder.encoder_value = shift + 2
-        elif goal == 'right': self.steer_state = 'right'
-        elif goal == 'mid': self.steer_state = 'mid'
+    def turn(self, goal, shift=0, tolerance=5):
+        print(goal)
+        try:
+            if self.calibrating: return
+            if goal == 'left': val = shift + self.encoder.left
+            elif goal == 'right': val = self.encoder.right - shift
+            elif goal == 'mid': val = int((self.encoder.right - self.encoder.left) / 2 + self.encoder.left)
+            start_time = time.time()
+            while math.fabs(self.encoder.get_reading() - val) > tolerance and time.time() - start_time < 0.5:
+                print(math.fabs(self.encoder.get_reading() - val))
+                if math.fabs(self.encoder.get_reading() - val) > 60:
+                    self.steer_motor[0].off()
+                    self.steer_motor[1].off()
+                    self._calibrate_encoder()
+                    return
+                if self.encoder.get_reading() < val:
+                    self.steer_motor[0].off()
+                    self.steer_motor[1].on()
+                else:
+                    self.steer_motor[0].on()
+                    self.steer_motor[1].off()
+                time.sleep(0.075)
+            self.steer_motor[0].off()
+            self.steer_motor[1].off()
+        except:
+            self.turn('mid')
         
     def stop(self):
         self.direction = 0

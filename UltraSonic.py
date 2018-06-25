@@ -39,7 +39,7 @@ class UltraSonic:
     def send_state(self, thresh=100):
         frw_sonic_vals = [self._measure_distance(self.sonic1), self._measure_distance(self.sonic2), self._measure_distance(self.sonic3)]
         frw_least_distance = min(frw_sonic_vals)
-        print(frw_sonic_vals)
+##        print(frw_sonic_vals)
 ##        bck_sonic_vals
 ##        bck_least_distance
         if frw_least_distance < thresh:
