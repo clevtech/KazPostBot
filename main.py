@@ -8,7 +8,6 @@ host = ManualHost()
 ##cmd = None
 while True:
     cmd = host.read()
-    print(cmd)
     if cmd in ['Left is pressed', 'Right is pressed',
                'Up is pressed', 'Down is pressed',
                'Left is released', 'Right is released',

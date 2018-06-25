@@ -3,7 +3,7 @@ from RPi import GPIO
 class Encoder:
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
-        self.encoder = (2, 3)
+        self.encoder = (10, 9)
         GPIO.setup(self.encoder[0], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(self.encoder[1], GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         self.encoder_last_A, self.encoder_last_B, self.encoder_value, self.encoder_range = None, None, None, None
