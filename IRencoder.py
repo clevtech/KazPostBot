@@ -5,12 +5,11 @@ import time
 
 class IRencoder:
     def __init__(self, ir=17):
-        self.ir = 17
+        self.ir = ir
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.led, GPIO.OUT)
         GPIO.setup(self.ir, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         
-    def where_is(self):
+    def is_white(self):
         if GPIO.input(self.ir) == GPIO.LOW:
             return True
     

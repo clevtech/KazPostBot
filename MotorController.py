@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import thread
 from RPi import GPIO
-from Encoder import Encoder
+from IRencoder import IRencoder
 
 
 class MotorController:
@@ -18,8 +18,9 @@ class MotorController:
         self.steer_motor = (LED(23), LED(24))
         self.stop()
         self.direction = 0
-##        self.encoder = Encoder()
-##        self._calibrate_encoder()
+        self.ir = IRencoder()
+        while True:
+            print(self.ir.is_white())
         time.sleep(0.2)
         
     def _sonic_state(self):
