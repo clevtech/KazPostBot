@@ -13,13 +13,13 @@ class MotorController:
     def __init__(self):
         self.calibrating = False
         GPIO.setmode(GPIO.BCM)
-        self.front_motor = (LED(21), LED(20))
+        self.front_motor = (LED(20), LED(21))
         self.back_motor = (LED(26), LED(19))
         self.steer_motor = (LED(23), LED(24))
         self.stop()
         self.direction = 0
-        self.encoder = Encoder()
-        self._calibrate_encoder()
+##        self.encoder = Encoder()
+##        self._calibrate_encoder()
         time.sleep(0.2)
         
     def _sonic_state(self):
@@ -115,16 +115,15 @@ class MotorController:
         
 if __name__ == '__main__':
     control = MotorController()
-    time.sleep(1)
-    control.turn('left')
-    time.sleep(1)
-    control.turn('right')
-    time.sleep(1)
-    control.turn('mid')
-    time.sleep(1)
-    control.turn('left')
-    time.sleep(1)
-    control.turn('mid')
+    control.backward()
+    time.sleep(10)
+    control.stop()
+##    time.sleep(1)
+##    control.turn('mid')
+##    time.sleep(1)
+##    control.turn('left')
+##    time.sleep(1)
+##    control.turn('mid')
 ##    control.steer_right()
 ##    control.steer_left()
 ##    control.steer_right()
