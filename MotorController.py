@@ -21,6 +21,7 @@ class MotorController:
         self.steer = 0
         self.ir = IRencoder()
         self.calibrate_steer()
+        self.brake = False
         
     def _sonic_state(self):
         while True:
@@ -62,6 +63,7 @@ class MotorController:
         self.steer = 1
 
     def turn(self, goal):
+        self.brake = False
         if self.steer == 0:
             if goal == 'left':
                 return
@@ -76,7 +78,10 @@ class MotorController:
             elif goal == 'right':
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
-                time.sleep(0.7) # tune this
+                # time.sleep(0.7) # tune this
+                start_time = time.time()
+                while (time.time() - start_time < 0.7) and not self.brake:
+                    time.sleep(0.02)
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 2
@@ -84,7 +89,10 @@ class MotorController:
             if goal == 'left':
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
-                time.sleep(0.35) # tune this
+                # time.sleep(0.35) # tune this
+                start_time = time.time()
+                while (time.time() - start_time < 0.35) and not self.brake:
+                    time.sleep(0.02)
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 0
@@ -93,7 +101,10 @@ class MotorController:
             elif goal == 'right':
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
-                time.sleep(0.35)  # tune this
+                # time.sleep(0.35)  # tune this
+                start_time = time.time()
+                while (time.time() - start_time < 0.35) and not self.brake:
+                    time.sleep(0.02)
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 2
@@ -101,7 +112,10 @@ class MotorController:
             if goal == 'left':
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
-                time.sleep(0.7) # tune this
+                # time.sleep(0.7) # tune this
+                start_time = time.time()
+                while (time.time() - start_time < 0.7) and not self.brake:
+                    time.sleep(0.02)
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 0
