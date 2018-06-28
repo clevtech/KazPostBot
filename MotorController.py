@@ -15,7 +15,7 @@ class MotorController:
         GPIO.setmode(GPIO.BCM)
         self.front_motor = (LED(20), LED(21))
         self.back_motor = (LED(26), LED(19))
-        self.steer_motor = (LED(23), LED(24))
+        self.steer_motor = (LED(24), LED(23))
         self.stop()
         self.direction = 0
         self.steer = 0
@@ -49,14 +49,14 @@ class MotorController:
     def calibrate_steer(self):
         self.steer_motor[0].on()
         self.steer_motor[1].off()
-        time.sleep(0.8)
+        time.sleep(0.4)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         time.sleep(0.5)
         self.steer_motor[0].off()
         self.steer_motor[1].on()
         while not self.ir.is_white():
-            time.sleep(0.05)
+            time.sleep(0.02)
         self.steer_motor[0].off()
         self.steer_motor[1].off()
         self.steer = 1
@@ -69,14 +69,14 @@ class MotorController:
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
                 while not self.ir.is_white():
-                    time.sleep(0.05) # tune this
+                    time.sleep(0.02) # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 1
             elif goal == 'right':
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
-                time.sleep(1.5) # tune this
+                time.sleep(0.7) # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 2
@@ -84,7 +84,7 @@ class MotorController:
             if goal == 'left':
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
-                time.sleep(1) # tune this
+                time.sleep(0.35) # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 0
@@ -93,7 +93,7 @@ class MotorController:
             elif goal == 'right':
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
-                time.sleep(1)  # tune this
+                time.sleep(0.35)  # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 2
@@ -101,7 +101,7 @@ class MotorController:
             if goal == 'left':
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
-                time.sleep(1.5) # tune this
+                time.sleep(0.7) # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 0
@@ -109,7 +109,7 @@ class MotorController:
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
                 while not self.ir.is_white():
-                    time.sleep(0.05)  # tune this
+                    time.sleep(0.02)  # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
                 self.steer = 1
@@ -184,9 +184,6 @@ class MotorController:
         
 if __name__ == '__main__':
     control = MotorController()
-    control.backward()
-    time.sleep(10)
-    control.stop()
 ##    time.sleep(1)
 ##    control.turn('mid')
 ##    time.sleep(1)
