@@ -5,15 +5,15 @@ import time
 class UltraSonic:
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
-        self.sonic1 = (10, 9)
-        GPIO.setup(self.sonic1[0], GPIO.OUT)
-        GPIO.setup(self.sonic1[1], GPIO.IN)
-        self.sonic2 = (3, 4)
-        GPIO.setup(self.sonic2[0], GPIO.OUT)
-        GPIO.setup(self.sonic2[1], GPIO.IN)
-        self.sonic3 = (27, 22)
-        GPIO.setup(self.sonic3[0], GPIO.OUT)
-        GPIO.setup(self.sonic3[1], GPIO.IN)
+        self.flu = (10, 9)
+        GPIO.setup(self.flu[0], GPIO.OUT)
+        GPIO.setup(self.flu[1], GPIO.IN)
+        self.fmu = (3, 4)
+        GPIO.setup(self.fmu[0], GPIO.OUT)
+        GPIO.setup(self.fmu[1], GPIO.IN)
+        self.fru = (27, 22)
+        GPIO.setup(self.fru[0], GPIO.OUT)
+        GPIO.setup(self.fru[1], GPIO.IN)
         
         
     def _measure_distance(self, sonic):
@@ -37,9 +37,9 @@ class UltraSonic:
         return distance
         
     def send_state(self, thresh=100):
-        frw_sonic_vals = [self._measure_distance(self.sonic1), self._measure_distance(self.sonic2), self._measure_distance(self.sonic3)]
+        frw_sonic_vals = [self._measure_distance(self.flu), self._measure_distance(self.fmu), self._measure_distance(self.fru)]
         frw_least_distance = min(frw_sonic_vals)
-##        print(frw_sonic_vals)
+        print(frw_sonic_vals)
 ##        bck_sonic_vals
 ##        bck_least_distance
         if frw_least_distance < thresh:
@@ -51,7 +51,7 @@ class UltraSonic:
 if __name__ == "__main__":
     us = UltraSonic()
     while True:
-        us.send_state(True)
+        us.send_state()
         time.sleep(0.5)
             
             
