@@ -26,7 +26,7 @@ def setup_all():
 
 
 def check_time():
-    timer1 = naboox.read_json("timer.json")
+    timer1 = naboox.read_json("start.json")
     elapsed_time = time.time() - timer1
     ids, passcode, timer = read_config()
     if timer1 > timer:

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sms="http://kazpost.kz/smsgate">
+<soapenv:Header>
+<soapenv:Username>mailing_rus</soapenv:Username>
+<soapenv:Password>WFpbGluZzEyMzRrYXpwb3N0</soapenv:Password>
+</soapenv:Header>
+   <soapenv:Body>
+      <sms:send>
+         <!--body-->
+         <element>
+            <phoneNumber>[ID]</phoneNumber>
+            <message>[date] Vam postupila posylka v Robopochtaliyon :Astana, Mangilik El prospekt, C4.6. Kod dostupa [pin]. Srok dlya zabora posylki 30 minut.</message>
+         </element>
+         <!--body-->
+      </sms:send>
+   </soapenv:Body>
+</soapenv:Envelope>
