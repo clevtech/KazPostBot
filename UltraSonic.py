@@ -5,13 +5,13 @@ import time
 class UltraSonic:
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
-        self.flu = (10, 9)
+        self.flu = (2, 3)
         GPIO.setup(self.flu[0], GPIO.OUT)
         GPIO.setup(self.flu[1], GPIO.IN)
-        self.fmu = (3, 4)
+        self.fmu = (27, 22)
         GPIO.setup(self.fmu[0], GPIO.OUT)
         GPIO.setup(self.fmu[1], GPIO.IN)
-        self.fru = (27, 22)
+        self.fru = (10, 9)
         GPIO.setup(self.fru[0], GPIO.OUT)
         GPIO.setup(self.fru[1], GPIO.IN)
         
