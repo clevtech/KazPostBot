@@ -16,6 +16,8 @@ class MotorController:
         self.front_motor = (LED(20), LED(21))
         self.back_motor = (LED(26), LED(19))
         self.steer_motor = (LED(24), LED(23))
+        self.switch = LED(4)
+        self.switch.on()
         self.stop()
         self.direction = 0
         self.steer = 0
