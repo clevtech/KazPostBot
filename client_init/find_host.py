@@ -31,7 +31,7 @@ def nmap_host():
     # Vendor list for MAC address
     ip_raw = get_ip().split(".")
     ip = ip_raw[0] + "." + ip_raw[1] + "." + ip_raw[2] + ".*"
-    nm.scan(ip, arguments='-O')
+    nm.scan(ip, arguments='-sn')
     mac = "24:0A:64:43:77:DF"
     for h in nm.all_hosts():
         # print(nm[h]['addresses'])
