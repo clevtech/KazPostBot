@@ -29,11 +29,9 @@ class ManualHost:
                 if host:
                     try:
                         self.sock.connect((host, port))
-                        print("done!")
                         break
                     except:
                         number = number + 1
-                        print("sleep" + str(number))
                         time.sleep(1)
 
 
