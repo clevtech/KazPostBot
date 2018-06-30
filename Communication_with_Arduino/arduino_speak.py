@@ -68,6 +68,13 @@ def init_doar():
 
 if __name__ == '__main__':
     # sonar_read()
-    ser = init_doar()
-    print(open_doar(2, ser))
+    # ser = init_doar()
+    # print(open_doar(2, ser))
+    ser = connect_to("Sonar")
+    while 1:
+        raw_input()
+        obstacle = ser.readline().strip().decode("utf-8")
+        # TODO: do smt with this code
+        # If distance is less than 100 cm it sends 1
+        print(obstacle)
 
