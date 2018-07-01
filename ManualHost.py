@@ -15,6 +15,7 @@ class ManualHost:
 
         for i in range(len(hosters)):
             try:
+                print(hosters[i])
                 self.sock.connect((hosters[i], port))
                 old_host = False
                 break

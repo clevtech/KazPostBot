@@ -13,9 +13,9 @@ class MotorController:
     def __init__(self):
         self.calibrating = False
         GPIO.setmode(GPIO.BCM)
-        self.front_motor = (LED(20), LED(21))
+        self.front_motor = (LED(21), LED(20))
         self.back_motor = (LED(26), LED(19))
-        self.steer_motor = (LED(24), LED(23))
+        self.steer_motor = (LED(23), LED(24))
         self.switch = LED(4)
         self.switch.on()
         self.stop()
