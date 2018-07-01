@@ -28,7 +28,13 @@ void loop() {
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     delay(50); // Min wait is 29
     int pings = sonar[i].ping_cm();
-    if ((pings < 120) && (pings > 0)){
+    if ((pings < 50) && (pings > 0) && i == 0){
+      OBSTACLE = 1;
+      break;
+    }else if((pings < 80) && (pings > 0) && i == 1){
+      OBSTACLE = 1;
+      break;
+    }else if((pings < 50) && (pings > 0) && i == 2){
       OBSTACLE = 1;
       break;
     }
