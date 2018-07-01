@@ -15,12 +15,16 @@ import naboox.main as naboox
 import datetime
 
 
-def send():
+def send(type = "test"):
     url = "http://89.218.48.181:8080/smsgate/?wsdl"
     headers = {'content-type': 'text/xml'}
     IDs = naboox.read_json("cells_ID.json")
     PINs = naboox.read_json("cells_PIN.json")
-    with open("./request.xml", "r") as file:
+    if type == "test":
+        file_name = "./request-test.xml"
+    else:
+        file_name = "./request.xml"
+    with open(file_name, "r") as file:
         req = file.read()
         head = req.split("<!--body-->")[0]
         mid = req.split("<!--body-->")[1]
@@ -44,7 +48,6 @@ def send():
     for bod in body:
         request = request + bod
     request = request + tail
-
 
     response = requests.post(url, data=request.encode('utf-8'), headers=headers)
 

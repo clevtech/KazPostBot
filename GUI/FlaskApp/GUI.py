@@ -11,7 +11,10 @@ __status__ = "Development"
 from flask import Flask, render_template, request, Markup
 import time
 import naboox.main as naboox
-import random, pprint
+import random
+import smsgate
+import arduino_speak as ard
+import datetime
 
 
 app = Flask(__name__)  # Creating new flask app
@@ -22,14 +25,15 @@ def setup_all():
     data = [[0, 0, 0, 0], [0, 0, 0, 0]]
     naboox.write_json(data, "cells_ID.json")
     naboox.write_json(data, "cells_PIN.json")
-    naboox.write_json(None, "timer.json")
+    naboox.write_json(None, "start.json")
+    return ard.init_doar()
 
 
 def check_time():
     timer1 = naboox.read_json("start.json")
     elapsed_time = time.time() - timer1
     ids, passcode, timer = read_config()
-    if timer1 > timer:
+    if elapsed_time > timer:
         return True
     else:
         return False
@@ -41,8 +45,6 @@ def make_PIN():
     PIN = random.sample(range(1000, 9999), 8)
     PIN = [PIN[0:4], PIN[4:8]]
     naboox.write_json(PIN, "cells_PIN.json")
-    start_time = time.time()
-    naboox.write_json(start_time, "timer.json")
 
 
 def read_config():
@@ -56,10 +58,10 @@ def read_config():
             passcode = line.replace('\n', '').replace('\r', '').replace(" ", "").replace("passcode:", '')
         if line[0:3] == "id:":
             ids.append(line.replace('\n', '').replace('\r', '').replace(" ", "").replace("id:", ''))
-        if line[0:9] == "timer:":
+        if line[0:6] == "timer:":
             timer = line.replace('\n', '').replace('\r', '').replace(" ", "").replace("timer:", '')
 
-    return ids, passcode, timer
+    return ids, passcode, int(timer)
 
 
 # Hello page
@@ -147,8 +149,9 @@ def send():
     if check_time():
         return render_template(
             "home.html", **locals())
-    # TODO:  Едет до чего-то
-    # TODO: Отправляет СМС
+    naboox.send_tlg_msg("Я должен ехать", [274271705])
+    x = input("Нажми enter как доедешь")
+    smsgate.send()
     alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
     if request.method == 'POST':  # If user POST by clicking submit button any text
         PIN = request.form['passcode']
@@ -159,6 +162,8 @@ def send():
         for i in range(len(passc)):
             for j in range(len(passc[i])):
                 if PIN == passc[i][j]:
+
+
                     # TODO: Открой ячейку с этим номером
                     cell[i][j] = 0
                     naboox.write_json(cell, "cells_ID.json")
@@ -168,7 +173,8 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    setup_all()
-    # It creates application in special IP
-    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    # box = setup_all()
+    # # It creates application in special IP
+    # app.run(host=naboox.get_ip(), port=7777, debug=True)
+    check_time()
 
