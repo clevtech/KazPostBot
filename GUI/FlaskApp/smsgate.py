@@ -53,6 +53,9 @@ def send(type = "test"):
 
     pretyy = xml.dom.minidom.parseString(response.content)
     pretty_xml_as_string = pretyy.toprettyxml()
+    with open("log.txt", "r") as file:
+        file.write(pretty_xml_as_string)
+        file.write(str(datetime.datetime.now()))
     return 1
 
 
