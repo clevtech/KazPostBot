@@ -112,7 +112,7 @@ def setup():
 
 @app.route('/')
 def index():
-    return render_template("robot2.html")
+    return render_template("robot.html")
 
 
 @app.route('/<direction>', methods=['POST'])

@@ -48,3 +48,10 @@ def read_json(name):
         return json.load(f)
 
 
+
+def send_to_bot(conn, phrase):
+    res = phrase
+
+    vysl = res.encode("utf8")  # encode the result string
+    conn.sendall(vysl)  # send it to client
+

@@ -8,17 +8,42 @@ __maintainer__ = "Bauyrzhan Ospan"
 __email__ = "bospan@cleverest.tech"
 __status__ = "Development"
 
-from flask import Flask, render_template, request, Markup
+from flask import Flask, render_template, request, Markup, jsonify
 import time
 import naboox.main as naboox
 import random
 import smsgate
 import arduino_speak as ard
-import datetime
+import datetime, socket
+
+
+def socket_start():
+    port = 6666
+    ip = naboox.get_ip()
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # this is for easy starting/killing the app
+    soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    print('Socket created')
+    while 1:
+        try:
+            soc.bind((ip, port))
+            print('Socket bind complete')
+            break
+        except:
+            pass
+    soc.listen(1)
+    print('Socket now listening')
+    # this will make an infinite loop needed for
+    # not reseting server for every client
+    conn, addr = soc.accept()
+    ip, port = str(addr[0]), str(addr[1])
+    print('Accepting connection 1 from ' + ip + ':' + port)
+    phrase = 'Accepting connection 1 from ' + ip + ':' + port
+    return conn, phrase
 
 
 app = Flask(__name__)  # Creating new flask app
-
+conn, phrase = socket_start()
 
 
 def setup_all():
@@ -27,8 +52,6 @@ def setup_all():
     naboox.write_json(data, "cells_PIN.json")
     naboox.write_json(None, "start.json")
     make_PIN()
-
-
 
 
 def check_time():
@@ -64,6 +87,38 @@ def read_config():
             timer = line.replace('\n', '').replace('\r', '').replace(" ", "").replace("timer:", '')
 
     return ids, passcode, int(timer)
+
+# Pages started
+
+
+@app.route('/robot-control/')
+def robcont():
+    return render_template("robot-control.html")
+
+
+@app.route('/<direction>', methods=['POST'])
+def ajax_request(direction):
+    direction = str(direction).replace("\n", '').replace("\r", '')
+    if direction == "u-p":
+        naboox.send_to_bot(conn, "Up is pressed")
+    elif direction == "d-p":
+        naboox.send_to_bot(conn, "Down is pressed")
+    elif direction == "r-p":
+        naboox.send_to_bot(conn, "Right is pressed")
+    elif direction == "l-p":
+        naboox.send_to_bot(conn, "Left is pressed")
+
+    elif direction == "u-r":
+        naboox.send_to_bot(conn, "Up is released")
+    elif direction == "d-r":
+        naboox.send_to_bot(conn, "Down is released")
+    elif direction == "r-r":
+        naboox.send_to_bot(conn, "Right is released")
+    elif direction == "l-r":
+        naboox.send_to_bot(conn, "Left is released")
+
+    print(direction)
+    return jsonify()
 
 
 # Hello page
