@@ -150,7 +150,7 @@ def send():
     time.sleep(20)
     if check_time():
         return render_template(
-            "home.html", **locals())
+            "hello.html", **locals())
     naboox.send_tlg_msg("Я должен ехать", [274271705])
     x = input("Нажми enter как доедешь")
     smsgate.send()
