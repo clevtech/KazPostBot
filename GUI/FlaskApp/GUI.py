@@ -26,6 +26,7 @@ def setup_all():
     naboox.write_json(data, "cells_ID.json")
     naboox.write_json(data, "cells_PIN.json")
     naboox.write_json(None, "start.json")
+    make_PIN()
 
 
 
@@ -138,6 +139,7 @@ def cellz(cellN):
 # Login page, no authorisation with password
 @app.route("/login/")
 def login():
+    setup_all()
     alert = "Введите пароль"
     return render_template(
         "login.html", **locals())
@@ -146,14 +148,14 @@ def login():
 # Login page, no authorisation with password
 @app.route("/send/", methods=["GET", "POST"])
 def send():
-    make_PIN()
-    time.sleep(20)
-    if check_time():
-        return render_template(
-            "hello.html", **locals())
-    naboox.send_tlg_msg("Я должен ехать", [274271705])
-    x = input("Нажми enter как доедешь")
-    smsgate.send()
+#    make_PIN()
+    time.sleep(5)
+    #if check_time():
+    #    return render_template(
+    #        "hello.html", **locals())
+    #naboox.send_tlg_msg("Я должен ехать", [274271705])
+    #x = input("Нажми enter как доедешь")
+    smsgate.send("real")
     alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
     if request.method == 'POST':  # If user POST by clicking submit button any text
         PIN = request.form['passcode']
@@ -163,9 +165,7 @@ def send():
         cell = naboox.read_json(file)
         for i in range(len(passc)):
             for j in range(len(passc[i])):
-                if PIN == passc[i][j]:
-
-
+                if int(PIN) == int(passc[i][j]):
                     ard.open_doar(i, j, ard.init_doar())
                     cell[i][j] = 0
                     naboox.write_json(cell, "cells_ID.json")
@@ -175,8 +175,8 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    setup_all()
-    # # It creates application in special IP
+
+    # # It creates application in specsial IP
     app.run(host=naboox.get_ip(), port=7777, debug=True)
     # check_time()
 

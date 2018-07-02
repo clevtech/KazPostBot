@@ -35,31 +35,34 @@ def send(type = "test"):
         tail = req.split("<!--body-->")[2]
 
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    naboox.write_json(datetime.datetime.now().timestamp(), "start.json")
+    # naboox.write_json(datetime.datetime.now().timestamp(), "start.json")
 
     body = []
+    print(IDs)
     for i in range(len(IDs)):
-        for j in range(len(IDs)):
-            if int(IDs[i][j]) > 0:
+        for j in range(len(IDs[i])):
+            if IDs[i][j] != 0:
+                print(IDs[i][j])
                 body.append(mid_ID + str(IDs[i][j]) + mid_date + \
                           str(date) + mid_pin + str(PINs[i][j]) + mid_tail)
     request = head
-
+    print(body)
     for bod in body:
         request = request + bod
     request = request + tail
-
+    print(request)
     response = requests.post(url, data=request.encode('utf-8'), headers=headers)
 
     pretyy = xml.dom.minidom.parseString(response.content)
     pretty_xml_as_string = pretyy.toprettyxml()
-    with open("log.txt", "r") as file:
-        file.write(pretty_xml_as_string)
-        file.write(str(datetime.datetime.now()))
+    print(pretty_xml_as_string)
+    # with open("log.txt", "r") as file:
+    #     file.write(pretty_xml_as_string)
+    #     file.write(str(datetime.datetime.now()))
     return 1
 
 
 
 if __name__ == "__main__":
-    send()
+    send("real")
 

@@ -64,15 +64,24 @@ def open_doar(i, j, ser):
     ser.close()
 
 
+def open_doar2(i, ser):
+    num = i
+    ser.write(str(num).encode())
+    door = ser.readline().strip().decode("utf-8")
+    ser.close()
+
+
 def init_doar():
     ser = connect_to("Box")
     return ser
 
 
 if __name__ == '__main__':
-    # sonar_read()
-    ser = init_doar()
-    i = int(input("i: "))
-    j = int(input("j: "))
-    print(open_doar(i, j, ser))
+    while 1:
+        # sonar_read()
+        ser = init_doar()
+        i = int(input("i: "))
+        #j = int(input("j: "))
+        print(open_doar2(i, ser))
+        time.sleep(3)
 
