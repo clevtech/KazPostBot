@@ -1,7 +1,7 @@
-#define interval 3
+#define interval 20000
 void setup() {
   int incomingByte = 0;
-  int ledPins[] = {23, 25, 27, 29, 31, 33, 35, 37}; // LED pins
+  int ledPins[] = {23, 25, 27, 29, 33, 31, 37, 35}; // LED pins
   Serial.begin(115200); // Open serial monitor at 115200 baud to see ping results.
   while(!Serial.available() ){
     delay(10);
@@ -27,10 +27,10 @@ void loop()
          
                 // say what you got:
                 int ledPins[] = {23, 25, 27, 29, 31, 33, 35, 37}; // LED pins
-                Serial.println(ledPins[incomingByte]);
+                //Serial.println(ledPins[incomingByte]);
                 digitalWrite(ledPins[incomingByte], LOW);
                 delay(interval);
-//                digitalWrite(ledPins[incomingByte], LOW);
+                digitalWrite(ledPins[incomingByte], LOW);
                 
         }
 }
