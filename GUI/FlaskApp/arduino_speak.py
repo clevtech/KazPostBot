@@ -10,19 +10,20 @@ def serial_ports():
     elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
         # this excludes your current terminal "/dev/tty"
         ports = glob.glob('/dev/ttyACM*')
+        print(ports)
     elif sys.platform.startswith('darwin'):
         ports = glob.glob('/dev/tty.usbmodem*')
     else:
         raise EnvironmentError('Unsupported platform')
 
-    result = []
-    for port in ports:
-        try:
-            s = serial.Serial(port)
-            s.close()
-            result.append(port)
-        except (OSError, serial.SerialException):
-            pass
+    result = ports
+    # for port in ports:
+    #     try:
+    #         s = serial.Serial(port)
+    #         s.close()
+    #         result.append(port)
+    #     except (OSError, serial.SerialException):
+    #         pass
     return result
 
 
@@ -30,6 +31,7 @@ def serial_ports():
 # returns serial connection
 def connect_to(type):
     arduinos = serial_ports()
+    print(arduinos)
     ser = []
     for i in range(len(arduinos)):
         ser.append(serial.Serial(arduinos[i], 115200))
@@ -37,6 +39,7 @@ def connect_to(type):
         ser[i].write("?".encode())
         # time.sleep(0.1)
         types = ser[i].readline().strip().decode("utf-8")
+        print(types)
         if types == type:
             return ser[i]
 
@@ -51,7 +54,7 @@ def sonar_read():
 
 
 def open_doar(i, j, ser):
-    time.sleep(1)
+    #time.sleep(1)
     if i == 0:
         num = j
     else:
@@ -73,5 +76,7 @@ def init_doar():
 if __name__ == '__main__':
     # sonar_read()
     ser = init_doar()
-    print(open_doar(2, ser))
+    i = int(input("i: "))
+    j = int(input("j: "))
+    print(open_doar(i, j, ser))
 
