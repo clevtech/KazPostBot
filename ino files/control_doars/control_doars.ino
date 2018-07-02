@@ -36,7 +36,7 @@ void loop()
                 Serial.println(ledPins[incomingByte]);
                 digitalWrite(ledPins[incomingByte], LOW);
                 delay(interval);
-                digitalWrite(ledPins[incomingByte], LOW);
+                digitalWrite(ledPins[incomingByte], HIGH);
   }        
         }
 }

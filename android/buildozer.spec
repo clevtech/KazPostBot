@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = KazPostman control
 
 # (str) Package name
-package.name = myapp
+package.name = KPC
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = cleverest.tech
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -75,7 +75,7 @@ osx.kivy_version = 1.9.1
 #
 
 # (bool) Indicate if the application should be fullscreen or not
-fullscreen = 0
+fullscreen = 1
 
 # (string) Presplash background color (for new android toolchain)
 # Supported formats are: #RRGGBB #AARRGGBB or one of the following names:
@@ -88,13 +88,13 @@ fullscreen = 0
 #android.permissions = INTERNET
 
 # (int) Android API to use
-#android.api = 19
+android.api = 21
 
 # (int) Minimum API required
 #android.minapi = 9
 
 # (int) Android SDK version to use
-#android.sdk = 20
+android.sdk = 22
 
 # (str) Android NDK version to use
 #android.ndk = 9c
