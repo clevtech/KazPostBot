@@ -29,6 +29,7 @@ def setup_all():
     return ard.init_doar()
 
 
+
 def check_time():
     timer1 = naboox.read_json("start.json")
     elapsed_time = time.time() - timer1
@@ -89,7 +90,7 @@ def robot():
 
     if request.method == "POST":
         passcode = request.form['passcode']
-        ids, truepass = read_config()
+        ids, truepass, timer = read_config()
         if passcode == truepass:
             msg = "Кто-то зашел в кабинет"
             naboox.send_tlg_msg(msg, ids)
@@ -111,6 +112,7 @@ def cellz(cellN):
     alert = "Введите номер мобильного телефона клиента"
     i = int(cellN[4])
     j = int(cellN[5])
+    ard.open_doar(i, j, box)
     if request.method == 'POST':  # If user POST by clicking submit button any text
         ID = request.form['id']
         file = "cells_ID.json"
@@ -164,7 +166,7 @@ def send():
                 if PIN == passc[i][j]:
 
 
-                    # TODO: Открой ячейку с этим номером
+                    ard.open_doar(i, j, box)
                     cell[i][j] = 0
                     naboox.write_json(cell, "cells_ID.json")
     return render_template(
@@ -173,8 +175,8 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    # box = setup_all()
+    box = setup_all()
     # # It creates application in special IP
-    # app.run(host=naboox.get_ip(), port=7777, debug=True)
-    check_time()
+    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    # check_time()
 
