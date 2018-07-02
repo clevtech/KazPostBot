@@ -60,12 +60,8 @@ def open_doar(i, j, ser):
     else:
         num = j + 4
     ser.write(str(num).encode())
-    while 1:
-        door = ser.readline().strip().decode("utf-8")
-        if num == int(door):
-            return True
-        else:
-            return False
+    door = ser.readline().strip().decode("utf-8")
+    ser.close()
 
 
 def init_doar():

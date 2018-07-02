@@ -26,7 +26,7 @@ def setup_all():
     naboox.write_json(data, "cells_ID.json")
     naboox.write_json(data, "cells_PIN.json")
     naboox.write_json(None, "start.json")
-    return ard.init_doar()
+
 
 
 
@@ -112,7 +112,7 @@ def cellz(cellN):
     alert = "Введите номер мобильного телефона клиента"
     i = int(cellN[4])
     j = int(cellN[5])
-    ard.open_doar(i, j, box)
+    ard.open_doar(i, j, ard.init_doar())
     if request.method == 'POST':  # If user POST by clicking submit button any text
         ID = request.form['id']
         file = "cells_ID.json"
@@ -166,7 +166,7 @@ def send():
                 if PIN == passc[i][j]:
 
 
-                    ard.open_doar(i, j, box)
+                    ard.open_doar(i, j, ard.init_doar())
                     cell[i][j] = 0
                     naboox.write_json(cell, "cells_ID.json")
     return render_template(
@@ -175,7 +175,7 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    box = setup_all()
+    setup_all()
     # # It creates application in special IP
     app.run(host=naboox.get_ip(), port=7777, debug=True)
     # check_time()
