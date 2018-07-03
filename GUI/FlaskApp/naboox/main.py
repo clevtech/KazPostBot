@@ -10,7 +10,7 @@ __status__ = "Development"
 
 
 import telepot, socket
-import json
+import json, datetime
 
 """
 Cheat sheet of Bauyrzhan Ospan.
@@ -51,7 +51,9 @@ def read_json(name):
 
 def send_to_bot(conn, phrase):
     res = phrase
-
+    data = datetime.datetime.now()
+    with open("motion.txt", "a") as file:
+        file.write(str(data) + ": " + str(phrase) + "\n")
     vysl = res.encode("utf8")  # encode the result string
     conn.sendall(vysl)  # send it to client
 

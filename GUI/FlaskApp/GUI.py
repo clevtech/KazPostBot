@@ -43,7 +43,7 @@ def socket_start():
 
 
 app = Flask(__name__)  # Creating new flask app
-conn, phrase = socket_start()
+
 
 
 def setup_all():
@@ -93,14 +93,17 @@ def read_config():
 
 @app.route('/robot-control/')
 def robcont():
+
     return render_template("robot-control.html")
 
 
-@app.route('/<direction>', methods=['POST'])
+@app.route('/robot-control/<direction>', methods=['POST'])
 def ajax_request(direction):
-    direction = str(direction).replace("\n", '').replace("\r", '')
+    print(str(direction))
+    direction = str(direction).replace("\n", '').replace("\r", '').replace("/", "")
     if direction == "u-p":
         naboox.send_to_bot(conn, "Up is pressed")
+        print("Up is pressed")
     elif direction == "d-p":
         naboox.send_to_bot(conn, "Down is pressed")
     elif direction == "r-p":
@@ -149,13 +152,13 @@ def robot():
         ids, truepass, timer = read_config()
         if passcode == truepass:
             msg = "Кто-то зашел в кабинет"
-            naboox.send_tlg_msg(msg, ids)
+            #naboox.send_tlg_msg(msg, ids)
             return render_template(
                 "robot.html", **locals())
         else:
             alert = "Вы ввели неправильный пароль"
             msg = "Кто-то пытался зайти в кабинет, используя неправильный пароль"
-            naboox.send_tlg_msg(msg, ids)
+            #naboox.send_tlg_msg(msg, ids)
             return render_template(
                 "login.html", **locals())
     return render_template(
@@ -230,8 +233,8 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-
+    conn, phrase = socket_start()
     # # It creates application in specsial IP
-    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    app.run(host=naboox.get_ip(), port=7777)#, debug=True)
     # check_time()
 
