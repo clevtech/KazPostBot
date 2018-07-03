@@ -24,20 +24,23 @@ class MotorController:
         self.ir = IRencoder()
         self.calibrate_steer()
         self.brake = False
+        self.sonic_state = 'ok'
         self.sonic = UltraSonic()
         thread.start_new_thread(self._sonic_state, ())
         
     def _sonic_state(self):
         while True:
-            state = self.sonic.get_state()
-            print(state)
-            if self.direction == 1 and state == 'frw':
+##            print(self.sonic_state)
+            if self.direction == 1 and self.sonic_state == 'frw':
                 self.stop()
-            elif self.direction == 2 and state == 'bck':
+            elif self.direction == 2 and self.sonic_state == 'bck':
                 self.stop()
-            time.sleep(0.2)
+            self.sonic_state = self.sonic.get_state()
+            time.sleep(0.05)
         
     def forward(self):
+        if self.sonic_state == 'frw':
+            return
         self.direction = 1
         self.front_motor[0].off()
         self.front_motor[1].on()
@@ -45,6 +48,8 @@ class MotorController:
         self.back_motor[1].on()
         
     def backward(self):
+        if self.sonic_state == 'bck':
+            return
         self.direction = 2
         self.front_motor[0].on()
         self.front_motor[1].off()
