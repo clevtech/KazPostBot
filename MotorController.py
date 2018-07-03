@@ -13,9 +13,9 @@ class MotorController:
     def __init__(self):
         self.calibrating = False
         GPIO.setmode(GPIO.BCM)
-        self.front_motor = (LED(21), LED(20))
+        self.front_motor = (LED(20), LED(21))
         self.back_motor = (LED(26), LED(19))
-        self.steer_motor = (LED(23), LED(24))
+        self.steer_motor = (LED(24), LED(23))
         self.switch = LED(4)
         self.switch.on()
         self.stop()
@@ -24,16 +24,18 @@ class MotorController:
         self.ir = IRencoder()
         self.calibrate_steer()
         self.brake = False
+        self.sonic = UltraSonic()
+        thread.start_new_thread(self._sonic_state, ())
         
     def _sonic_state(self):
         while True:
-            state = self.sonic.send_state()
+            state = self.sonic.get_state()
             print(state)
             if self.direction == 1 and state == 'frw':
                 self.stop()
             elif self.direction == 2 and state == 'bck':
                 self.stop()
-            time.sleep(0.1)
+            time.sleep(0.2)
         
     def forward(self):
         self.direction = 1
@@ -72,7 +74,7 @@ class MotorController:
             elif goal == 'mid':
                 self.steer_motor[0].off()
                 self.steer_motor[1].on()
-                while not self.ir.is_white():
+                while not self.ir.is_white() and not self.brake:
                     time.sleep(0.02) # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
@@ -82,7 +84,7 @@ class MotorController:
                 self.steer_motor[1].on()
                 # time.sleep(0.7) # tune this
                 start_time = time.time()
-                while (time.time() - start_time < 0.7) and not self.brake:
+                while (time.time() - start_time < 0.65) and not self.brake:
                     time.sleep(0.02)
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()
@@ -124,7 +126,7 @@ class MotorController:
             elif goal == 'mid':
                 self.steer_motor[0].on()
                 self.steer_motor[1].off()
-                while not self.ir.is_white():
+                while not self.ir.is_white() and not self.brake:
                     time.sleep(0.02)  # tune this
                 self.steer_motor[0].off()
                 self.steer_motor[1].off()

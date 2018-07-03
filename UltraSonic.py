@@ -10,7 +10,9 @@ class UltraSonic:
     def get_state(self):
         self.front.write("?".encode())
         obstacle = self.front.readline().strip().decode("utf-8")
-        return obstacle
+        if obstacle == '1':
+            return 'frw'
+        return 'ok'
     
     def _serial_ports(self):
         if sys.platform.startswith('win'):
