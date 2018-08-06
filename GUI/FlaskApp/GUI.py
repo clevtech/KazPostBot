@@ -49,9 +49,9 @@ app = Flask(__name__)  # Creating new flask app
 def setup_all():
     data = [[0, 0, 0, 0], [0, 0, 0, 0]]
     naboox.write_json(data, "cells_ID.json")
-    naboox.write_json(data, "cells_PIN.json")
+    #naboox.write_json(data, "cells_PIN.json")
     naboox.write_json(None, "start.json")
-    make_PIN()
+    #make_PIN()
 
 
 def check_time():
@@ -171,8 +171,9 @@ def cellz(cellN):
     alert = "Введите номер мобильного телефона клиента"
     i = int(cellN[4])
     j = int(cellN[5])
-    ard.open_doar(i, j, ard.init_doar())
+
     if request.method == 'POST':  # If user POST by clicking submit button any text
+        ard.open_doar(i, j, ard.init_doar())
         ID = request.form['id']
         file = "cells_ID.json"
         data = naboox.read_json(file)
@@ -233,7 +234,8 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    conn, phrase = socket_start()
+    # conn, phrase = socket_start()
+
     # # It creates application in specsial IP
     app.run(host=naboox.get_ip(), port=7777)#, debug=True)
     # check_time()
