@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <Ultrasonic.h>
-#include <MotorDriver.h>
 
 /*
 0 - STOP
@@ -22,51 +21,52 @@ Ultrasonic ultrasonicC(49, 48);
 Ultrasonic ultrasonicL(51, 50);
 
 // Turn motor values
-int L = 30;
-int R = 28;
+#define L  A1
+#define R  A0
+
+// Motor values
+#define FRW  A3
+#define BCW  A2
 
 // Turning last point: 1 = center, 0 = left, 2 = right
 int turn = 1;
 
-// Motor shield
-MotorDriver m;
-
 // Done
 void turn_left() {
-  digitalWrite(L, HIGH);
+  digitalWrite(L, LOW);
   while(digitalRead(LS) > 0){
     delay(1);
   }
-  digitalWrite(L, LOW);
+  digitalWrite(L, HIGH);
   turn = 0;
 }
 
 // Done
 void turn_right() {
-  digitalWrite(R, HIGH);
+  digitalWrite(R, LOW);
   while(digitalRead(RS) > 0){
     delay(1);
   }
-  digitalWrite(R, LOW);
+  digitalWrite(R, HIGH);
   turn = 2;
 }
 
 // Done
 void turn_center() {
   if(turn == 0){
-    digitalWrite(R, HIGH);
+    digitalWrite(R, LOW);
     while(digitalRead(CS) > 0){
       delay(1);
     }
-    digitalWrite(R, LOW);
+    digitalWrite(R, HIGH);
     turn = 1;
   }
   else if(turn == 2){
-    digitalWrite(L, HIGH);
+    digitalWrite(L, LOW);
     while(digitalRead(CS) > 0){
       delay(1);
     }
-    digitalWrite(L, LOW);
+    digitalWrite(L, HIGH);
     turn = 1;
   }
   else if(turn == 1){
@@ -76,18 +76,18 @@ void turn_center() {
 
 // Done
 void FWD() {
-  m.motor(1,FORWARD,0);
+  digitalWrite(FRW, LOW);
 }
 
 // Done
 void BWD() {
-  m.motor(2,FORWARD,0);
+  digitalWrite(BCW, LOW);
 }
 
 // Done
 void STOP() {
-  m.motor(1,FORWARD,255);
-  m.motor(2,FORWARD,255);
+  digitalWrite(FRW, HIGH);
+  digitalWrite(BCW, HIGH);
 }
 
 // Done
@@ -100,45 +100,80 @@ void tackle() {
 }
 
 void calibrate() {
+  digitalWrite(L, HIGH);
+  digitalWrite(R, HIGH);
   STOP();
+  // Serial.println("Turning right");
+  // turn_right();
+  // Serial.println("Turning right is done");
+  // delay(1000);
+  // Serial.println("Turning left");
+  // turn_left();
+  // Serial.println("Turning left is done");
+  // delay(1000);
+  // Serial.println("Turning center");
+  // turn_center();
+  // Serial.println("Turning center is done");
+  // delay(1000);
   Serial.println("Turning right");
-  turn_right();
-  Serial.println("Turning right is done");
+  digitalWrite(R, LOW);
+  delay(100);
+  digitalWrite(R, HIGH);
+  Serial.println("Turned right");
   delay(1000);
   Serial.println("Turning left");
-  turn_left();
-  Serial.println("Turning left is done");
-  delay(1000);
-  Serial.println("Turning center");
-  turn_center();
-  Serial.println("Turning center is done");
+  digitalWrite(L, LOW);
+  delay(100);
+  digitalWrite(L, HIGH);
+  Serial.println("Turned left");
   delay(1000);
   Serial.println("Moving forward");
   FWD();
-  delay(100);
+  delay(1000);
   Serial.println("Stop");
   STOP();
   Serial.println("Moving backward");
   BWD();
-  delay(100);
+  delay(1000);
   Serial.println("Stop");
   STOP();
+  delay(1000);
 }
 
 void setup() {
-  STOP();
   Serial.begin(115200);
   delay(20000);
   Serial.println("Calibration is began");
+  pinMode(FRW, OUTPUT);
+  pinMode(BCW, OUTPUT);
   pinMode(L, OUTPUT);
   pinMode(R, OUTPUT);
   pinMode(LS, INPUT);
   pinMode(CS, INPUT);
   pinMode(RS, INPUT);
+  STOP();
   calibrate();
   Serial.println("Calibration is done");
 }
 
 void loop() {
-  calibrate();
+  Serial.println("Turn right");
+  while(digitalRead(RS) < 1){
+    delay(1);
+  }
+  Serial.println("Turned right");
+  delay(1000);
+  Serial.println("Turn center");
+  while(digitalRead(CS) < 1){
+    delay(1);
+  }
+  Serial.println("Turned center");
+  delay(1000);
+  Serial.println("Turn left");
+  while(digitalRead(LS) < 1){
+    delay(1);
+  }
+  Serial.println("Turned left");
+  delay(1000);
+  // calibrate();
 }
