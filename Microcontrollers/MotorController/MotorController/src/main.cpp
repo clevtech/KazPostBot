@@ -11,62 +11,91 @@
 */
 
 // Turning sensor outputs
-int LS = 39;
-int RS = 37;
-int CS = 35;
+#define LS A7
+#define RS A4
+#define CS A5
 
 // Sonar values
-Ultrasonic ultrasonicR(47, 46);
-Ultrasonic ultrasonicC(49, 48);
-Ultrasonic ultrasonicL(51, 50);
+Ultrasonic ultrasonicR(13, 12);
+Ultrasonic ultrasonicC(11, 10);
+Ultrasonic ultrasonicL(24, 25);
 
 // Turn motor values
-#define L  A1
-#define R  A0
+#define L  29
+#define R  31
 
 // Motor values
-#define FRW  A3
-#define BCW  A2
+#define FRW  53
+#define BCW  51
 
 // Turning last point: 1 = center, 0 = left, 2 = right
 int turn = 1;
 
 // Done
 void turn_left() {
-  digitalWrite(L, LOW);
-  while(digitalRead(LS) > 0){
-    delay(1);
+  int del = 0;
+  if(turn != 0){
+    if(turn == 1){
+      del = 60;
+    }
+    else{
+      del = 120;
+    }
+    digitalWrite(L, LOW);
+    int i = 0;
+    while(i < del){
+      delay(1);
+      i = i + 1;
+    }
+    digitalWrite(L, HIGH);
+    Serial.println(i);
+    turn = 0;
   }
-  digitalWrite(L, HIGH);
-  turn = 0;
 }
 
 // Done
 void turn_right() {
-  digitalWrite(R, LOW);
-  while(digitalRead(RS) > 0){
-    delay(1);
+  int del = 0;
+  if(turn != 2){
+    if(turn == 1){
+      del = 60;
+    }
+    else{
+      del = 120;
+    }
+    digitalWrite(R, LOW);
+    int i = 0;
+    while(i < del){
+      delay(1);
+      i = i + 1;
+    }
+    digitalWrite(R, HIGH);
+    Serial.println(i);
+    turn = 2;
   }
-  digitalWrite(R, HIGH);
-  turn = 2;
 }
 
 // Done
 void turn_center() {
+  int i = 0;
   if(turn == 0){
     digitalWrite(R, LOW);
-    while(digitalRead(CS) > 0){
+    while(analogRead(CS) > 1 and i < 60){
       delay(1);
+      i = i + 1;
     }
     digitalWrite(R, HIGH);
+    Serial.println(i);
     turn = 1;
   }
   else if(turn == 2){
     digitalWrite(L, LOW);
-    while(digitalRead(CS) > 0){
+    while(analogRead(CS) > 1 and i < 60){
       delay(1);
+      i = i + 1;
     }
     digitalWrite(L, HIGH);
+    Serial.println(i);
     turn = 1;
   }
   else if(turn == 1){
@@ -77,10 +106,12 @@ void turn_center() {
 // Done
 void FWD() {
   digitalWrite(FRW, LOW);
+  digitalWrite(BCW, HIGH);
 }
 
 // Done
 void BWD() {
+  digitalWrite(FRW, HIGH);
   digitalWrite(BCW, LOW);
 }
 
@@ -88,6 +119,8 @@ void BWD() {
 void STOP() {
   digitalWrite(FRW, HIGH);
   digitalWrite(BCW, HIGH);
+  digitalWrite(L, HIGH);
+  digitalWrite(R, HIGH);
 }
 
 // Done
@@ -99,81 +132,46 @@ void tackle() {
   }
 }
 
-void calibrate() {
-  digitalWrite(L, HIGH);
-  digitalWrite(R, HIGH);
-  STOP();
-  // Serial.println("Turning right");
-  // turn_right();
-  // Serial.println("Turning right is done");
-  // delay(1000);
-  // Serial.println("Turning left");
-  // turn_left();
-  // Serial.println("Turning left is done");
-  // delay(1000);
-  // Serial.println("Turning center");
-  // turn_center();
-  // Serial.println("Turning center is done");
-  // delay(1000);
-  Serial.println("Turning right");
-  digitalWrite(R, LOW);
-  delay(100);
-  digitalWrite(R, HIGH);
-  Serial.println("Turned right");
-  delay(1000);
-  Serial.println("Turning left");
-  digitalWrite(L, LOW);
-  delay(100);
-  digitalWrite(L, HIGH);
-  Serial.println("Turned left");
-  delay(1000);
-  Serial.println("Moving forward");
-  FWD();
-  delay(1000);
-  Serial.println("Stop");
-  STOP();
-  Serial.println("Moving backward");
-  BWD();
-  delay(1000);
-  Serial.println("Stop");
-  STOP();
-  delay(1000);
-}
 
 void setup() {
   Serial.begin(115200);
-  delay(20000);
-  Serial.println("Calibration is began");
   pinMode(FRW, OUTPUT);
   pinMode(BCW, OUTPUT);
   pinMode(L, OUTPUT);
   pinMode(R, OUTPUT);
-  pinMode(LS, INPUT);
-  pinMode(CS, INPUT);
-  pinMode(RS, INPUT);
   STOP();
-  calibrate();
-  Serial.println("Calibration is done");
 }
 
 void loop() {
-  Serial.println("Turn right");
-  while(digitalRead(RS) < 1){
-    delay(1);
-  }
-  Serial.println("Turned right");
-  delay(1000);
-  Serial.println("Turn center");
-  while(digitalRead(CS) < 1){
-    delay(1);
-  }
-  Serial.println("Turned center");
-  delay(1000);
-  Serial.println("Turn left");
-  while(digitalRead(LS) < 1){
-    delay(1);
-  }
-  Serial.println("Turned left");
-  delay(1000);
-  // calibrate();
+  if (Serial.available() > 0) {
+    int Value = Serial.read();
+    if (Value == 63){
+      Serial.println("MOT");
+    }
+    else{
+                //tackle();
+                // read the incoming byte:
+                int incomingByte = Value - 48;
+                if(incomingByte == 0){
+                  STOP();
+                }
+                else if(incomingByte == 1){
+                  FWD();
+                }
+                else if(incomingByte == 2){
+                  BWD();
+                }
+                else if(incomingByte == 3){
+                  turn_center();
+                }
+                else if(incomingByte == 4){
+                  turn_right();
+                }
+                else if(incomingByte == 5){
+                  turn_left();
+                }
+
+                //tackle();
+              }
+      }
 }

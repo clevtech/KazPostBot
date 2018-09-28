@@ -46,14 +46,3 @@ def write_json(data, name):
 def read_json(name):
     with open(name, 'r') as f:
         return json.load(f)
-
-
-
-def send_to_bot(conn, phrase):
-    res = phrase
-    data = datetime.datetime.now()
-    with open("motion.txt", "a") as file:
-        file.write(str(data) + ": " + str(phrase) + "\n")
-    vysl = res.encode("utf8")  # encode the result string
-    conn.sendall(vysl)  # send it to client
-

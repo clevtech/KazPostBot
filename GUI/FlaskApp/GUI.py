@@ -17,33 +17,8 @@ import arduino_speak as ard
 import datetime, socket
 
 
-def socket_start():
-    port = 6666
-    ip = naboox.get_ip()
-    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # this is for easy starting/killing the app
-    soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print('Socket created')
-    while 1:
-        try:
-            soc.bind((ip, port))
-            print('Socket bind complete')
-            break
-        except:
-            pass
-    soc.listen(1)
-    print('Socket now listening')
-    # this will make an infinite loop needed for
-    # not reseting server for every client
-    conn, addr = soc.accept()
-    ip, port = str(addr[0]), str(addr[1])
-    print('Accepting connection 1 from ' + ip + ':' + port)
-    phrase = 'Accepting connection 1 from ' + ip + ':' + port
-    return conn, phrase
-
-
 app = Flask(__name__)  # Creating new flask app
-
+mot = ard.init_motor()
 
 
 def setup_all():
@@ -64,9 +39,7 @@ def check_time():
         return False
 
 
-
 def make_PIN():
-
     PIN = random.sample(range(1000, 9999), 8)
     PIN = [PIN[0:4], PIN[4:8]]
     naboox.write_json(PIN, "cells_PIN.json")
@@ -93,7 +66,6 @@ def read_config():
 
 @app.route('/robot-control/')
 def robcont():
-
     return render_template("robot-control.html")
 
 
@@ -102,25 +74,23 @@ def ajax_request(direction):
     print(str(direction))
     direction = str(direction).replace("\n", '').replace("\r", '').replace("/", "")
     if direction == "u-p":
-        naboox.send_to_bot(conn, "Up is pressed")
+        ard.motion(mot, "U")
         print("Up is pressed")
     elif direction == "d-p":
-        naboox.send_to_bot(conn, "Down is pressed")
+        ard.motion(mot, "D")
     elif direction == "r-p":
-        naboox.send_to_bot(conn, "Right is pressed")
+        ard.motion(mot, "R")
     elif direction == "l-p":
-        naboox.send_to_bot(conn, "Left is pressed")
+        ard.motion(mot, "L")
 
     elif direction == "u-r":
-        naboox.send_to_bot(conn, "Up is released")
+        ard.motion(mot, "S")
     elif direction == "d-r":
-        naboox.send_to_bot(conn, "Down is released")
+        ard.motion(mot, "S")
     elif direction == "r-r":
-        naboox.send_to_bot(conn, "Right is released")
+        ard.motion(mot, "C")
     elif direction == "l-r":
-        naboox.send_to_bot(conn, "Left is released")
-
-    print(direction)
+        ard.motion(mot, "C")
     return jsonify()
 
 
@@ -209,11 +179,6 @@ def login():
 def send():
 #    make_PIN()
     time.sleep(5)
-    #if check_time():
-    #    return render_template(
-    #        "hello.html", **locals())
-    #naboox.send_tlg_msg("Я должен ехать", [274271705])
-    #x = input("Нажми enter как доедешь")
     smsgate.send("real")
     alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
     if request.method == 'POST':  # If user POST by clicking submit button any text
@@ -234,9 +199,5 @@ def send():
 
 # Main flask app
 if __name__ == "__main__":
-    # conn, phrase = socket_start()
-
-    # # It creates application in specsial IP
     app.run(host=naboox.get_ip(), port=7777)#, debug=True)
     # check_time()
-

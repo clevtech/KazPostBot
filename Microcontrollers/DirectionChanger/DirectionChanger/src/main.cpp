@@ -1,11 +1,16 @@
 #include <Arduino.h>
 
+int analogPin = 0;
+int val = 0;
+
 void setup()
 {
   Serial.begin(115200);
+  pinMode(2, INPUT);
 }
 void loop()
 {
-  Serial.println(digitalRead(2)); // print the data from the sensor
-  // delay(500);
+  val = analogRead(analogPin);     // read the input pin
+  Serial.println(val);
+  delay(100);
 }

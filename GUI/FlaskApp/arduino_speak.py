@@ -44,15 +44,6 @@ def connect_to(type):
             return ser[i]
 
 
-def sonar_read():
-    ser = connect_to("Sonar")
-    while 1:
-        obstacle = ser.readline().strip().decode("utf-8")
-        # TODO: do smt with this code
-        # If distance is less than 100 cm it sends 1
-        print(obstacle)
-
-
 def open_doar(i, j, ser):
     #time.sleep(1)
     if i == 0:
@@ -64,16 +55,29 @@ def open_doar(i, j, ser):
     ser.close()
 
 
-def open_doar2(i, ser):
-    num = i
-    ser.write(str(num).encode())
-    door = ser.readline().strip().decode("utf-8")
-    ser.close()
-
-
 def init_doar():
     ser = connect_to("Box")
     return ser
+
+
+def init_motor():
+    ser = connect_to("MOT")
+    return ser
+
+
+def motion(ser, direction):
+    if direction == "U":
+        ser.write(str(1).encode());
+    if direction == "D":
+        ser.write(str(2).encode());
+    if direction == "S":
+        ser.write(str(0).encode());
+    if direction == "C":
+        ser.write(str(3).encode());
+    if direction == "R":
+        ser.write(str(4).encode());
+    if direction == "L":
+        ser.write(str(5).encode());
 
 
 if __name__ == '__main__':
@@ -84,4 +88,3 @@ if __name__ == '__main__':
         #j = int(input("j: "))
         print(open_doar2(i, ser))
         time.sleep(3)
-
