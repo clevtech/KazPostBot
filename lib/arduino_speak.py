@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 import sys
 import glob
 import serial
@@ -17,13 +21,6 @@ def serial_ports():
         raise EnvironmentError('Unsupported platform')
 
     result = ports
-    # for port in ports:
-    #     try:
-    #         s = serial.Serial(port)
-    #         s.close()
-    #         result.append(port)
-    #     except (OSError, serial.SerialException):
-    #         pass
     return result
 
 
@@ -45,7 +42,6 @@ def connect_to(type):
 
 
 def open_doar(i, j, ser):
-    #time.sleep(1)
     if i == 0:
         num = j
     else:
@@ -67,24 +63,14 @@ def init_motor():
 
 def motion(ser, direction):
     if direction == "U":
-        ser.write(str(1).encode());
+        ser.write(str(1).encode())
     if direction == "D":
-        ser.write(str(2).encode());
+        ser.write(str(2).encode())
     if direction == "S":
-        ser.write(str(0).encode());
+        ser.write(str(0).encode())
     if direction == "C":
-        ser.write(str(3).encode());
+        ser.write(str(3).encode())
     if direction == "R":
-        ser.write(str(4).encode());
+        ser.write(str(4).encode())
     if direction == "L":
-        ser.write(str(5).encode());
-
-
-if __name__ == '__main__':
-    while 1:
-        # sonar_read()
-        ser = init_doar()
-        i = int(input("i: "))
-        #j = int(input("j: "))
-        print(open_doar2(i, ser))
-        time.sleep(3)
+        ser.write(str(5).encode())

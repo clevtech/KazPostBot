@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import math, time
+
+
+import time
 from geographiclib.geodesic import Geodesic
 import sys
 import glob
 import serial
-
 
 
 def serial_ports():
@@ -74,14 +75,18 @@ def get_direction(NOW, GOAL, angle):
     else:
         return "done"
 
+
 if __name__ == '__main__':
     ser = connect_to("GPS")
     GOAL_string = input("Where to go?:(divide by ';') ")
+    GOAL_string = "51.092449;71.398744"
+    print("Goal is " + str(GOAL_string))
     goal = GOAL_string.split(";")
     GOAL = [float(goal[0]), float(goal[1])]
     while 1:
         ser.write("g".encode())
         GPS = ser.readline().strip().decode("utf-8")
+        print(GPS)
         while GPS[0] == 0:
             time.sleep(1)
         # GPS = input("Where we are?: ")

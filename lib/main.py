@@ -9,10 +9,9 @@ __email__ = "bospan@cleverest.tech"
 __status__ = "Development"
 
 
-import telepot, socket
-import json, datetime
-import math
-from geographiclib.geodesic import Geodesic
+import telepot
+import socket
+import json
 
 """
 Cheat sheet of Bauyrzhan Ospan.
@@ -23,7 +22,10 @@ Cheat sheet of Bauyrzhan Ospan.
 def send_tlg_msg(msg, ids):
     bot = telepot.Bot('610077316:AAFakq71aegcWzsRHQLxopH762gtNl1eCkw')
     for id in ids:
-        bot.sendMessage(str(id), str(msg))
+        try:
+            bot.sendMessage(str(id), str(msg))
+        except:
+            pass
 
 
 # Get IP as string of the host machine

@@ -10,23 +10,28 @@ __status__ = "Development"
 
 from flask import Flask, render_template, request, Markup, jsonify
 import time
-import naboox.main as naboox
+import lib.main as naboox
 import random
 import smsgate
-import arduino_speak as ard
+import lib.arduino_speak as ard
 import datetime, socket
 
 
 app = Flask(__name__)  # Creating new flask app
-mot = ard.init_motor()
+while True:
+    try:
+        mot = ard.init_motor()
+        break
+    except:
+        pass
 
 
 def setup_all():
     data = [[0, 0, 0, 0], [0, 0, 0, 0]]
     naboox.write_json(data, "cells_ID.json")
-    #naboox.write_json(data, "cells_PIN.json")
+    # naboox.write_json(data, "cells_PIN.json")
     naboox.write_json(None, "start.json")
-    #make_PIN()
+    # make_PIN()
 
 
 def check_time():
@@ -102,7 +107,7 @@ def hello():
 
 
 # Choosing cell to load
-@app.route("/robot/", methods=["GET", "POST"])  # Root for hello page is index "/"
+@app.route("/robot/", methods=["GET", "POST"])
 def robot():
     alert = "Выберите ячейку"
     file = "cells_ID.json"
@@ -122,13 +127,13 @@ def robot():
         ids, truepass, timer = read_config()
         if passcode == truepass:
             msg = "Кто-то зашел в кабинет"
-            #naboox.send_tlg_msg(msg, ids)
+            naboox.send_tlg_msg(msg, ids)
             return render_template(
                 "robot.html", **locals())
         else:
             alert = "Вы ввели неправильный пароль"
             msg = "Кто-то пытался зайти в кабинет, используя неправильный пароль"
-            #naboox.send_tlg_msg(msg, ids)
+            naboox.send_tlg_msg(msg, ids)
             return render_template(
                 "login.html", **locals())
     return render_template(
