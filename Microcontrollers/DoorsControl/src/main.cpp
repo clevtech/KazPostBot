@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #define interval 20000
+
 void setup() {
   int incomingByte = 0;
   int ledPins2[] = {23, 25, 27, 29, 33, 31, 37, 35}; // LED pins
@@ -29,7 +31,7 @@ void loop()
     else{
                 // read the incoming byte:
                 int incomingByte = Value - 48;
-         
+
                 // say what you got:
 //                int ledPins[] = {23, 25, 27, 29, 31, 33, 35, 37}; // LED pins
                 int ledPins[] = {31, 33, 35, 37, 29, 27, 25, 23};
@@ -37,6 +39,6 @@ void loop()
                 digitalWrite(ledPins[incomingByte], LOW);
                 delay(interval);
                 digitalWrite(ledPins[incomingByte], HIGH);
-  }        
+  }
         }
 }

@@ -48,14 +48,3 @@ def write_json(data, name):
 def read_json(name):
     with open(name, 'r') as f:
         return json.load(f)
-
-
-def get_direction(NOW, GOAL):
-    geod = Geodesic.WGS84
-    # y, x
-    initGPS = NOW
-    goalGPS = GOAL
-    g = geod.Inverse(initGPS[0], initGPS[1], goalGPS[0], goalGPS[1])
-    degrees = g["azi1"]
-    degrees = (degrees + 360) % 360
-    return degrees

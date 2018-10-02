@@ -75,14 +75,16 @@ def get_direction(NOW, GOAL, angle):
         return "done"
 
 if __name__ == '__main__':
-    # ser = connect_to("GPS")
+    ser = connect_to("GPS")
     GOAL_string = input("Where to go?:(divide by ';') ")
     goal = GOAL_string.split(";")
     GOAL = [float(goal[0]), float(goal[1])]
     while 1:
-        # ser.write("g".encode())
-        # GPS = ser.readline().strip().decode("utf-8")
-        GPS = input("Where we are?: ")
+        ser.write("g".encode())
+        GPS = ser.readline().strip().decode("utf-8")
+        while GPS[0] == 0:
+            time.sleep(1)
+        # GPS = input("Where we are?: ")
         GPS = GPS.split(";")
         NOW = [float(GPS[0]), float(GPS[1])]
         angle = float(GPS[2])

@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <NewPing.h>
 
 #define SONAR_NUM 3      // Number of sensors.
@@ -49,4 +50,3 @@ void loop() {
     }
   }
 }
-
