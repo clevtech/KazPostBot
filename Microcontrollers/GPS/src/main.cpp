@@ -5,12 +5,8 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_HMC5883_U.h>
 
-
 static const int RXPin = 8, TXPin = 9;
 static const uint32_t GPSBaud = 9600;
-float headingDegrees = 0;
-float LNG = 0;
-float LAT = 0;
 
 // Assign a Uniquej ID to the HMC5883 Compass Sensor
 Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
@@ -25,13 +21,12 @@ SoftwareSerial ss(RXPin, TXPin);
 void displayCompassInfo()
 {
   sensors_event_t event;
-  delay(100);
-  mag.begin();
   mag.getEvent(&event);
-  delay(100);
+  // Calculate heading when the magnetometer is level, then correct for signs of axis.
   float heading = atan2(event.magnetic.y, event.magnetic.x);
-  float declinationAngle = 0.22;
+  float declinationAngle = 8;
   heading += declinationAngle;
+
   // Correct for when signs are reversed.
   if(heading < 0)
     heading += 2*PI;
@@ -41,55 +36,51 @@ void displayCompassInfo()
     heading -= 2*PI;
 
   // Convert radians to degrees for readability.
-  headingDegrees = heading * 180/M_PI;
+  float headingDegrees = heading * 180/M_PI;
+
+  Serial.println(headingDegrees);
+
+  delay(500);
 }
+
+
 
 void displayGpsInfo()
 {
+  // Prints the location if lat-lng information was recieved
   if (gps.location.isValid())
   {
-    LAT = gps.location.lat();
-    LNG = gps.location.lng();
+    Serial.print(gps.location.lat(), 6);
+    Serial.print(F(","));
+    Serial.print(gps.location.lng(), 6);
   }
   // prints invalid if no information was recieved in regards to location.
   else
   {
-    LAT = 0;
-    LNG = 0;
+    Serial.print(F("INVALID"));
+  }
+  if(mag.begin())
+  {
+    Serial.print(",");
+    displayCompassInfo();
   }
 }
 
+
+
 void setup()
 {
-  sensor_t sensor;
-  mag.getSensor(&sensor);
   Serial.begin(115200);
-  delay(3000);
   ss.begin(GPSBaud);
-  delay(3000);
+  Serial.read();
+  Serial.println("GPS");
 }
 
 void loop()
 {
-  if(Serial.available()){
-    int Value = Serial.read();
-    if (Value==103){
-      if(ss.available()){
-        delay(100);
-        while(gps.encode(ss.read()))
-          delay(100);
-          displayGpsInfo();
-          delay(100);
-          displayCompassInfo();
-          // delay(100);
-    }
-    else{
-      Serial.println("GPS sensor is not available");
-    }
-        Serial.println(String(LAT) + ";" + String(LNG) + ";" + String(headingDegrees));
-    }
-    else{
-      Serial.println("GPS");
-    }
-}
+  // This sketch displays information every time a new sentence is correctly encoded from the GPS Module.
+  if (ss.available() > 0)
+    if (gps.encode(ss.read()))
+    if (Serial.read()=='g')
+    displayGpsInfo();
 }

@@ -15,6 +15,8 @@
 #define RS A4
 #define CS A5
 
+#define d 200
+
 // Sonar values
 Ultrasonic ultrasonicR(13, 12);
 Ultrasonic ultrasonicC(11, 10);
@@ -36,10 +38,10 @@ void turn_left() {
   int del = 0;
   if(turn != 0){
     if(turn == 1){
-      del = 60;
+      del = d;
     }
     else{
-      del = 120;
+      del = 3*d;
     }
     digitalWrite(L, LOW);
     int i = 0;
@@ -58,10 +60,10 @@ void turn_right() {
   int del = 0;
   if(turn != 2){
     if(turn == 1){
-      del = 60;
+      del = d;
     }
     else{
-      del = 120;
+      del = 3*d;
     }
     digitalWrite(R, LOW);
     int i = 0;
@@ -80,7 +82,7 @@ void turn_center() {
   int i = 0;
   if(turn == 0){
     digitalWrite(R, LOW);
-    while(analogRead(CS) > 1 and i < 60){
+    while(analogRead(CS) > 1 and i < d){
       delay(1);
       i = i + 1;
     }
@@ -90,7 +92,7 @@ void turn_center() {
   }
   else if(turn == 2){
     digitalWrite(L, LOW);
-    while(analogRead(CS) > 1 and i < 60){
+    while(analogRead(CS) > 1 and i < d){
       delay(1);
       i = i + 1;
     }

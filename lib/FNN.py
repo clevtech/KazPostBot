@@ -40,9 +40,7 @@ def connect_to(type):
         time.sleep(10)
         ser.write("?".encode())
         ser.flush()
-        print("Sended ?")
         types = ser.readline()
-        print("Raw output is " + str(types))
         types = types.strip().decode("utf-8")
         print("Output is: " + str(types))
         if types == type:
@@ -60,7 +58,8 @@ def get_direction(NOW, GOAL, angle):
     distance = g['s12']
 
     degrees = (degrees + 360) % 360
-    degrees = degrees - angle
+    print("Degrees is: " + str(degrees))
+    angle = degrees - angle
 
     if angle < 20 and angle > -20:
         dir = "center"
@@ -69,7 +68,7 @@ def get_direction(NOW, GOAL, angle):
     else:
         dir = "right"
 
-    print(distance)
+    print("Distance to point is: " + str(distance))
     if distance > 3:
         return dir
     else:
@@ -79,27 +78,39 @@ def get_direction(NOW, GOAL, angle):
 if __name__ == '__main__':
     ser = connect_to("GPS")
     print("Connected to " + str(ser))
-    GOAL_string = input("Where to go?:(divide by ';') ")
-    GOAL_string = "51.092449;71.398744"
+    GOAL_string = "51.093636,71.399268"
     print("Goal is " + str(GOAL_string))
-    goal = GOAL_string.split(";")
+    goal = GOAL_string.split(",")
     GOAL = [float(goal[0]), float(goal[1])]
 
     while 1:
         ser.write("g".encode())
         GPS = ser.readline().strip().decode("utf-8")
-        print(GPS)
-        GPS = GPS.split(";")
-        print(GPS)
-        NOW = [float(GPS[0]), float(GPS[1])]
-        print(NOW)
-        angle = float(GPS[2])
-        print(angle)
-        while NOW[0] == 0:
-            time.sleep(3)
-            ser.write("g".encode())
-            GPS = ser.readline().strip().decode("utf-8")
-        # GPS = input("Where we are?: "
-        dir = get_direction(NOW, GOAL, angle)
-        print(dir)
-        time.sleep(1)
+        print("Raw output is: " + GPS)
+        try:
+            GPS1 = GPS.split(",")
+            NOW = [float(GPS1[0]), float(GPS1[1])]
+            print("We are here: " + str(NOW))
+            angle = float(GPS1[2])
+            print("Our angle is: " + str(angle))
+            while NOW[0] == 0:
+                try:
+                    time.sleep(3)
+                    ser.write("g".encode())
+                    GPS = ser.readline().strip().decode("utf-8")
+                except:
+                    print("SMT is wrong")
+            # GPS = input("Where we are?: "
+
+            dir = get_direction(NOW, GOAL, angle)
+        except:
+            angle = float(GPS.split(",")[1])
+            NOW = input("Our value is: ")
+            NOW = NOW.split(', ')
+            NOW = [float(NOW[0]), float(NOW[1])]
+            print("Our GPS is: " + str(NOW))
+            print("Our angle is: " + str(angle))
+            dir = get_direction(NOW, GOAL, angle)
+        print("We need to go to: " + dir)
+        print("=================================")
+        time.sleep(10)
