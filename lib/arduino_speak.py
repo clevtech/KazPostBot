@@ -74,3 +74,9 @@ def motion(ser, direction):
         ser.write(str(4).encode())
     if direction == "L":
         ser.write(str(5).encode())
+
+
+if __name__ == "__main__":
+    print("Connecting")
+    ser = connect_to("GPS")
+    print("connected to " + str(ser))

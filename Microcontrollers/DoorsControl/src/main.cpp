@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define interval 20000
+#define interval 10000
 
 void setup() {
   int incomingByte = 0;

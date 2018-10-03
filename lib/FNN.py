@@ -19,7 +19,6 @@ def serial_ports():
         ports = glob.glob('/dev/tty.usbmodem*')
     else:
         raise EnvironmentError('Unsupported platform')
-
     result = []
     for port in ports:
         try:
@@ -35,24 +34,25 @@ def serial_ports():
 # returns serial connection
 def connect_to(type):
     arduinos = serial_ports()
-    ser = []
     for i in range(len(arduinos)):
-        ser.append(serial.Serial(arduinos[i], 115200))
-        time.sleep(1)
-        ser[i].write("?".encode())
-        # time.sleep(0.1)
-        types = ser[i].readline().strip().decode("utf-8")
+        ser = serial.Serial(arduinos[i], "115200")
+        print("Connected to " + str(arduinos[i]))
+        time.sleep(10)
+        ser.write("?".encode())
+        ser.flush()
+        print("Sended ?")
+        types = ser.readline()
+        print("Raw output is " + str(types))
+        types = types.strip().decode("utf-8")
+        print("Output is: " + str(types))
         if types == type:
-            return ser[i]
+            return ser
 
 
 def get_direction(NOW, GOAL, angle):
     geod = Geodesic.WGS84
 
     initGPS = NOW
-
-    while NOW[0] == 0:
-        time.sleep(1)
 
     goalGPS = GOAL
     g = geod.Inverse(initGPS[0], initGPS[1], goalGPS[0], goalGPS[1])
@@ -78,21 +78,28 @@ def get_direction(NOW, GOAL, angle):
 
 if __name__ == '__main__':
     ser = connect_to("GPS")
+    print("Connected to " + str(ser))
     GOAL_string = input("Where to go?:(divide by ';') ")
     GOAL_string = "51.092449;71.398744"
     print("Goal is " + str(GOAL_string))
     goal = GOAL_string.split(";")
     GOAL = [float(goal[0]), float(goal[1])]
+
     while 1:
         ser.write("g".encode())
         GPS = ser.readline().strip().decode("utf-8")
         print(GPS)
-        while GPS[0] == 0:
-            time.sleep(1)
-        # GPS = input("Where we are?: ")
         GPS = GPS.split(";")
+        print(GPS)
         NOW = [float(GPS[0]), float(GPS[1])]
+        print(NOW)
         angle = float(GPS[2])
+        print(angle)
+        while NOW[0] == 0:
+            time.sleep(3)
+            ser.write("g".encode())
+            GPS = ser.readline().strip().decode("utf-8")
+        # GPS = input("Where we are?: "
         dir = get_direction(NOW, GOAL, angle)
-        time.sleep(1)
         print(dir)
+        time.sleep(1)

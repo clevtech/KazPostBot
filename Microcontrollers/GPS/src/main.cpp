@@ -64,29 +64,32 @@ void setup()
   sensor_t sensor;
   mag.getSensor(&sensor);
   Serial.begin(115200);
+  delay(3000);
   ss.begin(GPSBaud);
+  delay(3000);
 }
 
 void loop()
 {
   if(Serial.available()){
-  // This sketch displays information every time a new sentence is correctly encoded from the GPS Module.
-  if (Serial.read()=='g'){
-    if(ss.available() > 0){
-      delay(100);
-      while(gps.encode(ss.read()))
+    int Value = Serial.read();
+    if (Value==103){
+      if(ss.available()){
         delay(100);
-        displayGpsInfo();
-        delay(100);
-        displayCompassInfo();
-        delay(100);
-  }
-      Serial.println(String(LAT) + ";" + String(LNG) + ";" + String(headingDegrees));
-  // serialFlush();
-  }
-  else{
-    Serial.println("GPS");
-  // serialFlush();
-  }
+        while(gps.encode(ss.read()))
+          delay(100);
+          displayGpsInfo();
+          delay(100);
+          displayCompassInfo();
+          // delay(100);
+    }
+    else{
+      Serial.println("GPS sensor is not available");
+    }
+        Serial.println(String(LAT) + ";" + String(LNG) + ";" + String(headingDegrees));
+    }
+    else{
+      Serial.println("GPS");
+    }
 }
 }
