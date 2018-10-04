@@ -7,6 +7,7 @@ from geographiclib.geodesic import Geodesic
 import sys
 import glob
 import serial
+import math
 
 
 def serial_ports():
@@ -30,8 +31,6 @@ def serial_ports():
     return result
 
 
-# types: Sonar - sonar arduino, MOT - box controlling arduino
-# returns serial connection
 def connect_to(type):
     arduinos = serial_ports()
     for i in range(len(arduinos)):
@@ -49,68 +48,56 @@ def connect_to(type):
 
 def get_direction(NOW, GOAL, angle):
     geod = Geodesic.WGS84
-
     initGPS = NOW
-
     goalGPS = GOAL
     g = geod.Inverse(initGPS[0], initGPS[1], goalGPS[0], goalGPS[1])
     degrees = g["azi1"]
     distance = g['s12']
-
     degrees = (degrees + 360) % 360
-    print("Degrees is: " + str(degrees))
+    angle = math.radians(angle)
+    angle = math.degrees(math.atan2(-math.sin(angle), math.cos(angle)))
     angle = degrees - angle
-
     if angle < 20 and angle > -20:
-        dir = "center"
+        dir = "C"
     elif angle < 0:
-        dir = "left"
+        dir = "L"
     else:
-        dir = "right"
-
+        dir = "R"
     print("Distance to point is: " + str(distance))
-    if distance > 3:
+    if distance > 5:
         return dir
     else:
-        return "done"
+        return "Done"
+
+
+def read_GPS(ser, GOAL):
+    while 1:
+        ser.write("g".encode())
+        GPS = ser.readline().strip().decode("utf-8")
+        try:
+            GPS1 = GPS.split(",")
+            NOW = [float(GPS1[0]), float(GPS1[1])]
+            angle = float(GPS1[2])
+            if NOW[0] == 0:
+                return "S"
+            print("Our GPS is: " + str(NOW) + " and angle is: " + angle)
+            dir = get_direction(NOW, GOAL, angle)
+            return dir
+        except:
+            pass
 
 
 if __name__ == '__main__':
-    ser = connect_to("GPS")
-    print("Connected to " + str(ser))
+    while 1:
+        ser = connect_to("GPS")
+        if ser:
+            break
     GOAL_string = "51.093636,71.399268"
     print("Goal is " + str(GOAL_string))
     goal = GOAL_string.split(",")
     GOAL = [float(goal[0]), float(goal[1])]
-
     while 1:
-        ser.write("g".encode())
-        GPS = ser.readline().strip().decode("utf-8")
-        print("Raw output is: " + GPS)
-        try:
-            GPS1 = GPS.split(",")
-            NOW = [float(GPS1[0]), float(GPS1[1])]
-            print("We are here: " + str(NOW))
-            angle = float(GPS1[2])
-            print("Our angle is: " + str(angle))
-            while NOW[0] == 0:
-                try:
-                    time.sleep(3)
-                    ser.write("g".encode())
-                    GPS = ser.readline().strip().decode("utf-8")
-                except:
-                    print("SMT is wrong")
-            # GPS = input("Where we are?: "
-
-            dir = get_direction(NOW, GOAL, angle)
-        except:
-            angle = float(GPS.split(",")[1])
-            NOW = input("Our value is: ")
-            NOW = NOW.split(', ')
-            NOW = [float(NOW[0]), float(NOW[1])]
-            print("Our GPS is: " + str(NOW))
-            print("Our angle is: " + str(angle))
-            dir = get_direction(NOW, GOAL, angle)
+        dir = read_GPS(ser, GOAL)
         print("We need to go to: " + dir)
         print("=================================")
         time.sleep(10)
