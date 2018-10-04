@@ -127,9 +127,14 @@ void STOP() {
 
 // Done
 void tackle() {
-  if(ultrasonicC.distanceRead(CM)<30 or
-      ultrasonicR.distanceRead(CM)<30 or
-        ultrasonicL.distanceRead(CM)<30){
+  int UR1 = ultrasonicC.distanceRead(CM);
+  delay(50);
+  int UR2 = ultrasonicR.distanceRead(CM);
+  delay(50);
+  int UR3 = ultrasonicL.distanceRead(CM);
+  if(UR1<40 and UR1>0 or
+      UR2<40 and UR2>0 or
+        UR3<40 and UR3>0){
           STOP();
   }
 }
@@ -145,13 +150,14 @@ void setup() {
 }
 
 void loop() {
+  tackle();
   if (Serial.available() > 0) {
     int Value = Serial.read();
     if (Value == 63){
       Serial.println("MOT");
     }
     else{
-                //tackle();
+                tackle();
                 // read the incoming byte:
                 int incomingByte = Value - 48;
                 if(incomingByte == 0){
@@ -173,7 +179,7 @@ void loop() {
                   turn_left();
                 }
 
-                //tackle();
+                tackle();
               }
       }
 }
