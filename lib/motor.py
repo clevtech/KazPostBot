@@ -37,17 +37,19 @@ def move(dir, mot):
         ard.motion(mot, "L")
     if dir == "C":
         ard.motion(mot, "C")
-    else:
-        ard.motion(mot, "S")
 
 
 def to_point(ser, mot, point):
     goals = take_points(point)
+    dir = "S"
     try:
-        for GOAL in goals:
-            print("Going to point: " + GOAL)
-            goal = GOAL.split(",")
+        for GOAL1 in goals:
+            print("Going to point: " + GOAL1)
+            goal = GOAL1.split(",")
+            print("Matrix of point is: " + str(goal))
             GOAL = [float(goal[0]), float(goal[1])]
+            print("Starting moving")
+
             while dir != "Done":
                 try:
                     print("Checking kinect")
@@ -71,11 +73,13 @@ def to_point(ser, mot, point):
                     print("Something went wrong, stopping")
                     move("S", mot)
                     time.sleep(10)
+                    pass
             print("Came to point, stopping and doing next")
             move("S", mot)
             time.sleep(10)
             print("=========================================")
     except:
+        pass
         print("Something globally went wrong, stopping")
         move("S", mot)
         time.sleep(10)
@@ -84,15 +88,17 @@ def to_point(ser, mot, point):
 def main():
     while True:
         try:
-            mot = ard.init_motor()
-            if mot:
+            mot, ser = ard.init_motor()
+            if mot and ser:
+                print("Connected to motors: " + str(mot))
                 break
         except:
             pass
-    while 1:
-        ser = gps.connect_to("GPS")
-        if ser:
-            break
+    # while 1:
+    #     ser = gps.connect_to("GPS")
+    #     print("Connected to GPS: " + str(ser))
+    #     if ser:
+    #         break
 
     print("Starting going to point A")
     print("")

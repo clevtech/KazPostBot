@@ -11,7 +11,7 @@ __status__ = "Development"
 
 import requests
 import xml.dom.minidom
-import naboox.main as naboox
+import lib.main as naboox
 import datetime
 
 
@@ -65,4 +65,3 @@ def send(type = "test"):
 
 if __name__ == "__main__":
     send("real")
-

@@ -37,8 +37,11 @@ def connect_to(type):
         # time.sleep(0.1)
         types = ser[i].readline().strip().decode("utf-8")
         print(types)
-        if types == type:
-            return ser[i]
+        if types == "MOT":
+            mot = ser[i]
+        elif types == "GPS":
+            gps = ser[i]
+    return mot, gps
 
 
 def open_doar(i, j, ser):
@@ -57,8 +60,8 @@ def init_doar():
 
 
 def init_motor():
-    ser = connect_to("MOT")
-    return ser
+    mot, gps = connect_to("MOT")
+    return mot, gps
 
 
 def motion(ser, direction):

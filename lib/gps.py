@@ -53,17 +53,21 @@ def get_direction(NOW, GOAL, angle):
     g = geod.Inverse(initGPS[0], initGPS[1], goalGPS[0], goalGPS[1])
     degrees = g["azi1"]
     distance = g['s12']
+    print("Distance is: " + str(distance))
     degrees = (degrees + 360) % 360
+    print("Degrees to go is: " + str(degrees))
     angle = math.radians(angle)
     angle = math.degrees(math.atan2(-math.sin(angle), math.cos(angle)))
     angle = degrees - angle
+    print("Angle to turn is: " + str(angle))
     if angle < 20 and angle > -20:
         dir = "C"
     elif angle < 0:
         dir = "L"
     else:
         dir = "R"
-    print("Distance to point is: " + str(distance))
+    print("Direction is: " + str(dir))
+    #print("Distance to point is: " + str(distance))
     if distance > 5:
         return dir
     else:
@@ -74,17 +78,23 @@ def read_GPS(ser, GOAL):
     while 1:
         ser.write("g".encode())
         GPS = ser.readline().strip().decode("utf-8")
+        print("Raw output from gps is: " + str(GPS))
         try:
             GPS1 = GPS.split(",")
             NOW = [float(GPS1[0]), float(GPS1[1])]
-            angle = float(GPS1[2])
-            if NOW[0] == 0:
+            angle = float(GPS1[2]) - 110
+            print("Our gps now is: " + str(NOW))
+            print("Our angle now is: " + str(angle))
+            if int(NOW[0]) == 0:
+                print("Returning stop")
                 return "S"
-            print("Our GPS is: " + str(NOW) + " and angle is: " + angle)
-            dir = get_direction(NOW, GOAL, angle)
-            return dir
+            else:
+                print("Our GPS is: " + str(NOW) + " and angle is: " + str(angle))
+                print("Getting direction")
+                dir = get_direction(NOW, GOAL, angle)
+                return dir
         except:
-            pass
+            return "S"
 
 
 if __name__ == '__main__':
