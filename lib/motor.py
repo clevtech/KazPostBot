@@ -10,7 +10,9 @@ import sys
 import glob
 import serial
 import math
+import urllib.request
 import freenect
+import socket
 from numpy import *
 import arduino_speak as ard
 from flask import Flask
@@ -48,16 +50,41 @@ def hello():
 	return 'Hello World!'
 
 
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
+
 def read_GPS(GOAL):
     while 1:
         try:
-            with open("geolocation.txt", 'r') as geo:
-                GPS = str(geo.readline())
-                print(GPS)
-                longitude = GPS.split('"longitude":')[1].split(",")[0]
-                latitude = GPS.split('"latitude":')[1].split('}')[0]
-                NOW = [longitude, latitude]
-                break
+            fp = urllib.request.urlopen(str(get_ip())+":5000/GPS/")
+            mybytes = fp.read()
+            mystr = mybytes.decode("utf8")
+            fp.close()
+            GPS = str(mystr)
+            print(GPS)
+            longitude = GPS.split('"longitude":')[1].split(",")[0]
+            latitude = GPS.split('"latitude":')[1].split('}')[0]
+            NOW = [longitude, latitude]
+
+            fp2 = urllib.request.urlopen(str(get_ip())+":5000/ANGLE/")
+            mybytes2 = fp2.read()
+            mystr2 = mybytes2.decode("utf8")
+            fp2.close()
+            mystr2 = mystr.split(".")[0]
+            angle = str(mystr2)
+            print(angle)
+
+            break
         except:
             pass
 

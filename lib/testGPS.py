@@ -5,6 +5,9 @@ from flask_sockets import Sockets
 app = Flask(__name__)
 sockets = Sockets(app)
 
+GPS = []
+orient = []
+
 @sockets.route('/accelerometer')
 def echo_socket(ws):
 	f=open("accelerometer.txt","a")
@@ -41,6 +44,7 @@ def echo_socket(ws):
 	f=open("orientation.txt","w")
 	while True:
 		message = ws.receive()
+        orient = message
 		print(message)
 		ws.send(message)
 		print(message, file=f)
@@ -91,6 +95,7 @@ def echo_socket(ws):
 	f=open("geolocation.txt","w")
 	while True:
 		message = ws.receive()
+        GPS = message
 		print(message)
 		ws.send(message)
 		print(message, file=f)
@@ -101,6 +106,14 @@ def echo_socket(ws):
 @app.route('/')
 def hello():
 	return 'Hello World!'
+
+@app.route('/GPS/')
+def ggppss():
+	return str(GPS)
+
+@app.route('/ANGLE/')
+def angle():
+	return str(orient)
 
 if __name__ == "__main__":
 	from gevent import pywsgi
