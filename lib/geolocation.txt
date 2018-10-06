@@ -1,2 +1,0 @@
-{"mocked":false,"timestamp":1538811985407,"coords":{"speed":0,"heading":0,"accuracy":20.735000610351562,"longitude":71.3986519,"altitude":0,"latitude":51.0937378}}
-{"mocked":false,"timestamp":1538812026211,"coords":{"speed":0,"heading":0,"accuracy":20.600000381469727,"longitude":71.3986448,"altitude":0,"latitude":51.0937294}}
