@@ -64,53 +64,58 @@ def get_ip():
 
 
 def read_GPS(GOAL):
-    while 1:
-        try:
-            fp = urllib.request.urlopen(str(get_ip())+":5000/GPS/")
-            mybytes = fp.read()
-            mystr = mybytes.decode("utf8")
-            fp.close()
-            GPS = str(mystr)
-            print(GPS)
-            longitude = GPS.split('"longitude":')[1].split(",")[0]
-            latitude = GPS.split('"latitude":')[1].split('}')[0]
-            NOW = [longitude, latitude]
+	while 1:
+		try:
+			fp = urllib.request.urlopen("http://" + str(get_ip())+":5000/GPS/")
+			mybytes = fp.read()
+			# print(mybytes)
+			mystr = mybytes.decode("utf8")
+			fp.close()
+			GPS = str(mystr)
+			# print("Raw GPS is: " + GPS)
+			longitude = GPS.split('"longitude":')[1].split(",")[0]
+			latitude = GPS.split('"latitude":')[1].split('}')[0]
+			NOW = [latitude, longitude]
+			print(NOW)
 
-            fp2 = urllib.request.urlopen(str(get_ip())+":5000/ANGLE/")
-            mybytes2 = fp2.read()
-            mystr2 = mybytes2.decode("utf8")
-            fp2.close()
-            mystr2 = mystr.split(".")[0]
-            angle = str(mystr2)
-            print(angle)
+			fp2 = urllib.request.urlopen("http://" + str(get_ip())+":5000/ANGLE/")
+			mybytes2 = fp2.read()
+			mystr2 = mybytes2.decode("utf8")
+			print(mystr2)
+			fp2.close()
+			mystr2 = mystr2.split(".")[0]
+			angle = float(mystr2)
+			print(angle)
 
-            break
-        except:
-            pass
+			break
+		except:
+			raise
 
-    geod = Geodesic.WGS84
-    g = geod.Inverse(NOW[0], NOW[1], GOAL[0], GOAL[1])
+	geod = Geodesic.WGS84
+	g = geod.Inverse(float(NOW[0]), float(NOW[1]), float(GOAL[0]), float(GOAL[1]))
 
-    degrees = g["azi1"]
-    distance = g['s12']
-    print("Distance is: " + str(distance))
-    degrees = (degrees + 360) % 360
-    print("Degrees to go is: " + str(degrees))
-    angle = math.radians(angle)
-    angle = math.degrees(math.atan2(-math.sin(angle), math.cos(angle)))
-    angle = degrees - angle
-    print("Angle to turn is: " + str(angle))
-    if angle < 20 and angle > -20:
-        dir = "C"
-    elif angle < 0:
-        dir = "L"
-    else:
-        dir = "R"
-    print("Direction is: " + str(dir))
-    if distance > 5:
-        return dir
-    else:
-        return "Done"
+	degrees = g["azi1"]
+	distance = g['s12']
+	print("Distance is: " + str(distance))
+	degrees = (degrees + 360) % 360
+	print("Degrees to go is: " + str(degrees))
+	angle = math.radians(angle)
+	angle = math.degrees(math.atan2(-math.sin(angle), math.cos(angle)))
+	angle = (angle + 360) % 360
+	print("Our angle is: " + str(angle))
+	angle = degrees - angle
+	print("Angle to turn is: " + str(angle))
+	if angle < 20 and angle > -20:
+		dir = "C"
+	elif angle < 0:
+		dir = "L"
+	else:
+		dir = "R"
+	print("Direction is: " + str(dir))
+	if distance > 5:
+		return dir
+	else:
+		return "Done"
 
 
 def take_points(phase):
@@ -208,4 +213,5 @@ if __name__ == "__main__":
 	print("==============================")
 	# server = pywsgi.WSGIServer(('192.168.8.100', 5000), app, handler_class=WebSocketHandler)
 	# server.serve_forever()
-	main()
+	# main()
+	print(read_GPS([51.093829,71.399326]))
