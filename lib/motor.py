@@ -13,6 +13,76 @@ import math
 import freenect
 from numpy import *
 import arduino_speak as ard
+from flask import Flask
+from flask_sockets import Sockets
+from gevent import pywsgi
+from geventwebsocket.handler import WebSocketHandler
+
+
+app = Flask(__name__)
+sockets = Sockets(app)
+
+
+@sockets.route('/orientation')
+def echo_socket(ws):
+	f=open("orientation.txt","w")
+	while True:
+		message = ws.receive()
+		ws.send(message)
+		print(message, file=f)
+	f.close()
+
+@sockets.route('/geolocation')
+def echo_socket(ws):
+	f=open("geolocation.txt","w")
+	while True:
+		message = ws.receive()
+		ws.send(message)
+		print(message, file=f)
+	f.close()
+
+
+@app.route('/')
+def hello():
+	return 'Hello World!'
+
+
+def read_GPS(GOAL):
+    while 1:
+        try:
+            with open("geolocation.txt", 'r') as geo:
+                GPS = str(geo.readline())
+                print(GPS)
+                longitude = GPS.split('"longitude":')[1].split(",")[0]
+                latitude = GPS.split('"latitude":')[1].split('}')[0]
+                NOW = [longitude, latitude]
+                break
+        except:
+            pass
+
+    geod = Geodesic.WGS84
+    g = geod.Inverse(NOW[0], NOW[1], GOAL[0], GOAL[1])
+
+    degrees = g["azi1"]
+    distance = g['s12']
+    print("Distance is: " + str(distance))
+    degrees = (degrees + 360) % 360
+    print("Degrees to go is: " + str(degrees))
+    angle = math.radians(angle)
+    angle = math.degrees(math.atan2(-math.sin(angle), math.cos(angle)))
+    angle = degrees - angle
+    print("Angle to turn is: " + str(angle))
+    if angle < 20 and angle > -20:
+        dir = "C"
+    elif angle < 0:
+        dir = "L"
+    else:
+        dir = "R"
+    print("Direction is: " + str(dir))
+    if distance > 5:
+        return dir
+    else:
+        return "Done"
 
 
 def take_points(phase):
@@ -39,7 +109,7 @@ def move(dir, mot):
         ard.motion(mot, "C")
 
 
-def to_point(ser, mot, point):
+def to_point(mot, point):
     goals = take_points(point)
     dir = "S"
     try:
@@ -65,7 +135,7 @@ def to_point(ser, mot, point):
                             move("U", mot)
                             move(dir, mot)
                     print("Checking GPS")
-                    dir = gps.read_GPS(ser, GOAL)
+                    dir = read_GPS(GOAL)
                     print("Going to: " + str(dir))
                     move("U", mot)
                     move(dir, mot)
@@ -88,30 +158,27 @@ def to_point(ser, mot, point):
 def main():
     while True:
         try:
-            mot, ser = ard.init_motor()
-            if mot and ser:
+            mot = ard.init_motor()
+            if mot:
                 print("Connected to motors: " + str(mot))
                 break
         except:
             pass
-    # while 1:
-    #     ser = gps.connect_to("GPS")
-    #     print("Connected to GPS: " + str(ser))
-    #     if ser:
-    #         break
-
     print("Starting going to point A")
     print("")
-    to_point(ser, mot, "A")
+    to_point(mot, "A")
     print("A is done")
     time.sleep(30)
     print("")
     print("Starting going to point B")
-    to_point(ser, mot, "B")
+    to_point(mot, "B")
     print("Job is done, am I good girl?")
+
 
 if __name__ == "__main__":
     print("Inputs are okay")
     print("Starting moving")
     print("==============================")
+    server = pywsgi.WSGIServer(('192.168.1.107', 5000), app, handler_class=WebSocketHandler)
+	server.serve_forever()
     main()

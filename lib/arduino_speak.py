@@ -39,9 +39,8 @@ def connect_to(type):
         print(types)
         if types == "MOT":
             mot = ser[i]
-        elif types == "GPS":
-            gps = ser[i]
-    return mot, gps
+    return mot
+    # TODO: return both box and mot
 
 
 def open_doar(i, j, ser):

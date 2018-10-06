@@ -6,7 +6,6 @@ import time
 from geographiclib.geodesic import Geodesic
 import sys
 import glob
-import serial
 import math
 
 
