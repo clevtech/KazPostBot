@@ -44,6 +44,7 @@ def echo_socket(ws):
 
 @app.route('/')
 def hello():
+	main()
 	return 'Hello World!'
 
 
@@ -119,7 +120,6 @@ def to_point(mot, point):
             print("Matrix of point is: " + str(goal))
             GOAL = [float(goal[0]), float(goal[1])]
             print("Starting moving")
-
             while dir != "Done":
                 try:
                     print("Checking kinect")
@@ -176,9 +176,9 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Inputs are okay")
-    print("Starting moving")
-    print("==============================")
-    server = pywsgi.WSGIServer(('192.168.1.107', 5000), app, handler_class=WebSocketHandler)
-	server.serve_forever()
-    main()
+	print("Inputs are okay")
+	print("Starting moving")
+	print("==============================")
+	# server = pywsgi.WSGIServer(('192.168.8.100', 5000), app, handler_class=WebSocketHandler)
+	# server.serve_forever()
+	main()

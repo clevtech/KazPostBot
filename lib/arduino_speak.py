@@ -59,8 +59,8 @@ def init_doar():
 
 
 def init_motor():
-    mot, gps = connect_to("MOT")
-    return mot, gps
+    mot = connect_to("MOT")
+    return mot
 
 
 def motion(ser, direction):
