@@ -38,7 +38,7 @@ def echo_socket(ws):
 
 @sockets.route('/orientation')
 def echo_socket(ws):
-	f=open("orientation.txt","w")
+	f=open("orientation.txt","a")
 	while True:
 		message = ws.receive()
 		global orient
@@ -90,7 +90,7 @@ def echo_socket(ws):
 
 @sockets.route('/geolocation')
 def echo_socket(ws):
-	f=open("geolocation.txt","w")
+	f=open("geolocation.txt","a")
 	while True:
 		message = ws.receive()
 		global GPS

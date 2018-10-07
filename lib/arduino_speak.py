@@ -6,6 +6,7 @@ import sys
 import glob
 import serial
 import time
+import urllib.request
 
 
 def serial_ports():
@@ -63,7 +64,25 @@ def init_motor():
     return mot
 
 
+def read_values():
+    while 1:
+        try:
+            fp2 = urllib.request.urlopen("http://0.0.0.0:5000/ANGLE/")
+            mybytes2 = fp2.read()
+            mystr2 = mybytes2.decode("utf8")
+            print(mystr2)
+            fp2.close()
+            mystr2 = mystr2.split(".")[0]
+            angle = float(mystr2)
+            print(angle)
+            return angle
+        except:
+            return 0
+
+
 def motion(ser, direction):
+    start = time.time()
+    startAngle = read_values()
     if direction == "U":
         ser.write(str(1).encode())
     if direction == "D":
@@ -76,7 +95,12 @@ def motion(ser, direction):
         ser.write(str(4).encode())
     if direction == "L":
         ser.write(str(5).encode())
-
+    endAngle = read_values()
+    endtime = time.time()
+    string = "Start time: " + str(start) + ", End time: " + str(endtime) + ", Difference: " + str(endtime-start) + ", Start angle is: " + str(startAngle) + ", end angle is: " + str(endAngle) + ";"
+    f=open("log.txt","a")
+    print(string, file=f)
+    f.close()
 
 if __name__ == "__main__":
     print("Connecting")
