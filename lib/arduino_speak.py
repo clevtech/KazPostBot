@@ -27,7 +27,7 @@ def serial_ports():
 
 # types: Sonar - sonar arduino, Box - box controlling arduino
 # returns serial connection
-def connect_to(type):
+def connect_to():
     arduinos = serial_ports()
     print(arduinos)
     ser = []
@@ -40,8 +40,9 @@ def connect_to(type):
         print(types)
         if types == "MOT":
             mot = ser[i]
-    return mot
-    # TODO: return both box and mot
+        if types == "Box":
+            box = ser[i]
+    return mot, box
 
 
 def open_doar(i, j, ser):
@@ -52,16 +53,6 @@ def open_doar(i, j, ser):
     ser.write(str(num).encode())
     door = ser.readline().strip().decode("utf-8")
     ser.close()
-
-
-def init_doar():
-    ser = connect_to("Box")
-    return ser
-
-
-def init_motor():
-    mot = connect_to("MOT")
-    return mot
 
 
 def read_values():
@@ -95,9 +86,7 @@ def motion(ser, direction):
         ser.write(str(4).encode())
     if direction == "L":
         ser.write(str(5).encode())
-    endAngle = read_values()
-    endtime = time.time()
-    string = "Start time: " + str(start) + ", End time: " + str(endtime) + ", Difference: " + str(endtime-start) + ", Start angle is: " + str(startAngle) + ", end angle is: " + str(endAngle) + ";"
+    string = "Direction is: " + str(direction) + ", Start time: " + str(start) + ", Angle is: " + str(startAngle) + ";"
     f=open("log.txt","a")
     print(string, file=f)
     f.close()

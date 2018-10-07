@@ -11,6 +11,7 @@ __status__ = "Development"
 from flask import Flask, render_template, request, Markup, jsonify
 import time
 import lib.main as naboox
+import lib.motor as motor
 import random
 import smsgate
 import lib.arduino_speak as ard
@@ -18,12 +19,12 @@ import datetime, socket
 
 
 app = Flask(__name__)  # Creating new flask app
-while True:
-    try:
-        mot, box = ard.connect_to()
-        break
-    except:
-        pass
+# while True:
+#     try:
+#         mot, box = ard.connect_to()
+#         break
+#     except:
+#         pass
 
 
 def setup_all():
@@ -146,7 +147,7 @@ def cellz(cellN):
     j = int(cellN[5])
 
     if request.method == 'POST':  # If user POST by clicking submit button any text
-        ard.open_doar(i, j, ard.init_doar())
+        # ard.open_doar(i, j, ard.init_doar())
         ID = request.form['id']
         file = "cells_ID.json"
         data = naboox.read_json(file)
@@ -192,7 +193,7 @@ def send():
         for i in range(len(passc)):
             for j in range(len(passc[i])):
                 if int(PIN) == int(passc[i][j]):
-                    ard.open_doar(i, j, ard.init_doar())
+                    # ard.open_doar(i, j, ard.init_doar())
                     cell[i][j] = 0
                     naboox.write_json(cell, "cells_ID.json")
     return render_template(
@@ -200,29 +201,19 @@ def send():
 
 
 # Login page, no authorisation with password
-@app.route("/sended/", methods=["GET", "POST"])
-def send():
-    time.sleep(5)
-    smsgate.send("real")
-    alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
-    if request.method == 'POST':  # If user POST by clicking submit button any text
-        PIN = request.form['passcode']
-        file = "cells_PIN.json"
-        passc = naboox.read_json(file)
-        file = "cells_ID.json"
-        cell = naboox.read_json(file)
-        for i in range(len(passc)):
-            for j in range(len(passc[i])):
-                if int(PIN) == int(passc[i][j]):
-                    ard.open_doar(i, j, ard.init_doar())
-                    cell[i][j] = 0
-                    naboox.write_json(cell, "cells_ID.json")
+@app.route("/sended/<i>/", methods=["GET", "POST"])
+def sended(i):
+    if int(i) == 0:
+        time.sleep(10)
+        # motor.motion(mot, "A")
+        smsgate.send("test")
+    alert = "Чтобы получить посылку нажмите:"
     return render_template(
-        "pin.html", **locals())
+        "sended.html", **locals())
 
 
 # Main flask app
 if __name__ == "__main__":
-    # app.run(host=naboox.get_ip(), port=7777)#, debug=True)
-    make_PIN()
+    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    # make_PIN()
     # check_time()
