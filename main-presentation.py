@@ -146,7 +146,7 @@ def cellz(cellN):
 	j = int(cellN[5])
 
 	if request.method == 'POST':  # If user POST by clicking submit button any text
-		# ard.open_doar(i, j, ard.init_doar())
+		ard.open_doar(i, j, ard.init_doar())
 		ID = request.form['id']
 		file = "cells_ID.json"
 		data = naboox.read_json(file)
@@ -184,11 +184,12 @@ def send():
 	if check_time():
 		msg = "Поехал домой"
 		naboox.send_tlg_msg(msg, ids)
-		# try:
-		#     motor.motion(mot, "A")
-		# except:
-		#     msg = "Что случилось по пути домой, не могу доехать"
-		#     naboox.send_tlg_msg(msg, ids)
+		time.sleep(30)
+		try:
+		    motor.motion(mot, "A")
+		except:
+		    msg = "Что случилось по пути домой, не могу доехать"
+		    naboox.send_tlg_msg(msg, ids)
 		msg = "Я возле двери, впустите меня домой"
 		naboox.send_tlg_msg(msg, ids)
 		return render_template(
@@ -223,12 +224,12 @@ def sended(i):
 		naboox.write_json(time.time(), "start.json")
 		msg = "Я поехал доставлять посылки"
 		naboox.send_tlg_msg(msg, ids)
-		time.sleep(10)
-		# try:
-		#     motor.motion(mot, "A")
-		# except:
-		#     msg = "Что случилось по пути на точку доставки, не могу доехать"
-		#     naboox.send_tlg_msg(msg, ids)
+		time.sleep(30)
+		try:
+		    motor.motion(mot, "A")
+		except:
+		    msg = "Что случилось по пути на точку доставки, не могу доехать"
+		    naboox.send_tlg_msg(msg, ids)
 		smsgate.send("test")
 		msg = "Я приехал на точку"
 		naboox.send_tlg_msg(msg, ids)
