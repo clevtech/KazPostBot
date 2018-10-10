@@ -27,6 +27,8 @@ while True:
 		pass
 
 
+
+
 def setup_all():
 	data = [[0, 0, 0, 0], [0, 0, 0, 0]]
 	naboox.write_json(data, "cells_ID.json")
@@ -35,7 +37,8 @@ def setup_all():
 
 
 def check_time():
-	timer1 = naboox.read_json("start.json")
+	#timer1 = naboox.read_json("start.json")
+	timer1 = 120
 	elapsed_time = time.time() - timer1
 	ids, passcode, timer = read_config()
 	if elapsed_time > timer:
@@ -64,6 +67,8 @@ def read_config():
 
 	return ids, passcode, float(timer)
 
+
+ids, passcode4, timer4 = read_config()
 # Pages started
 
 
@@ -146,7 +151,7 @@ def cellz(cellN):
 	j = int(cellN[5])
 
 	if request.method == 'POST':  # If user POST by clicking submit button any text
-		ard.open_doar(i, j, ard.init_doar())
+		ard.open_doar(i, j, box)
 		ID = request.form['id']
 		file = "cells_ID.json"
 		data = naboox.read_json(file)
@@ -181,19 +186,19 @@ def login():
 @app.route("/send/", methods=["GET", "POST"])
 def send():
 	alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
-	if check_time():
-		msg = "Поехал домой"
-		naboox.send_tlg_msg(msg, ids)
-		time.sleep(30)
-		try:
-		    motor.motion(mot, "A")
-		except:
-		    msg = "Что случилось по пути домой, не могу доехать"
-		    naboox.send_tlg_msg(msg, ids)
-		msg = "Я возле двери, впустите меня домой"
-		naboox.send_tlg_msg(msg, ids)
-		return render_template(
-			"hello.html", **locals())
+	# if check_time():
+	# 	msg = "Поехал домой"
+	# 	naboox.send_tlg_msg(msg, ids)
+	# 	time.sleep(30)
+		# try:
+		#     motor.motion(mot, "A")
+		# except:
+		#     msg = "Что случилось по пути домой, не могу доехать"
+		#     naboox.send_tlg_msg(msg, ids)
+		# msg = "Я возле двери, впустите меня домой"
+		# naboox.send_tlg_msg(msg, ids)
+	# 	return render_template(
+	# 		"hello.html", **locals())
 	if request.method == 'POST':  # If user POST by clicking submit button any text
 		PIN = request.form['passcode']
 		file = "cells_PIN.json"
@@ -203,7 +208,12 @@ def send():
 		for i in range(len(passc)):
 			for j in range(len(passc[i])):
 				if int(PIN) == int(passc[i][j]):
-					# ard.open_doar(i, j, ard.init_doar())
+					try:
+						mot, box = ard.connect_to()
+						break
+					except:
+						pass
+					ard.open_doar(i, j, box)
 					msg = "Отдал посылку клиента: " + str(cell[i][j])
 					naboox.send_tlg_msg(msg, ids)
 					cell[i][j] = 0
@@ -222,17 +232,17 @@ def send():
 def sended(i):
 	if int(i) == 0:
 		naboox.write_json(time.time(), "start.json")
-		msg = "Я поехал доставлять посылки"
-		naboox.send_tlg_msg(msg, ids)
-		time.sleep(30)
-		try:
-		    motor.motion(mot, "A")
-		except:
-		    msg = "Что случилось по пути на точку доставки, не могу доехать"
-		    naboox.send_tlg_msg(msg, ids)
-		smsgate.send("test")
-		msg = "Я приехал на точку"
-		naboox.send_tlg_msg(msg, ids)
+		# msg = "Я поехал доставлять посылки"
+		# naboox.send_tlg_msg(msg, ids)
+		time.sleep(1)
+		# try:
+		#     motor.motion(mot, "A")
+		# except:
+		#     msg = "Что случилось по пути на точку доставки, не могу доехать"
+		#     naboox.send_tlg_msg(msg, ids)
+		smsgate.send("real")
+		# msg = "Я приехал на точку"
+		# naboox.send_tlg_msg(msg, ids)
 	alert = "Чтобы получить посылку нажмите:"
 	return render_template(
 		"sended.html", **locals())
@@ -240,4 +250,8 @@ def sended(i):
 
 # Main flask app
 if __name__ == "__main__":
+	# time.sleep(300)
+	id, passcode4, timer4 = read_config()
+	msg = "Я включился, мой IP: " + str(naboox.get_ip())
+	naboox.send_tlg_msg(msg, id)
 	app.run(host=naboox.get_ip(), port=7777, debug=True)

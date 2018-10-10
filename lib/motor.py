@@ -48,7 +48,9 @@ def read_values():
 			print(mystr2)
 			fp2.close()
 			mystr2 = mystr2.split(".")[0]
-			angle = float(mystr2)
+			print(mystr2)
+			angle = int(mystr2)
+			print("Angle is:")
 			print(angle)
 			return angle
 		except:
@@ -71,8 +73,9 @@ def turn(toAngle):
 	return dir
 
 
-def check_kinect():
+def check_kinect(mot):
 	print("Checking kinect")
+	start = 0
 	while 1:
 		check = kinect.motion()
 		break
@@ -86,15 +89,15 @@ def check_kinect():
 	# 	time.sleep(10)
 	# 	check = kinect.motion()
 	while check != "G":
-	    dir = check
-	    print("Going to: " + str(dir))
-	    if check != "G":
-	        move("U", mot)
-	        move(dir, mot)
-	    check = kinect.motion()
+		dir = check
+		print("Going to: " + str(dir))
+		if check != "G":
+			move("U", mot)
+			move(dir, mot)
+		check = kinect.motion()
 	move("S", mot)
 	now = time.time()
-	if start:
+	if start>0:
 		return float(now)-float(start)
 	else:
 		return 0
@@ -106,21 +109,21 @@ def motion(mot, point):
 	move("L", mot)
 	move("R", mot)
 	calibrate()
-	for i in len(range(times)):
+	for i in range(len(times)):
 		start = time.time()
 		now = time.time()
 		stopping = 0
-		while (now - start - stopping) < times:
-			stopping = stopping + float(check_kinect())
+		while (now - start - stopping) < times[i]:
+			# stopping = stopping + float(check_kinect(mot))
 			move("U", mot)
-			dir = turn(angle)
+			dir = turn(angle[i])
 		calibrate()
 		move("S", mot)
 	return "Done"
 
 
 def calibrate():
-	angle = read_values()
+	angle = float(read_values())
 	angle = math.radians(angle)
 	angle = math.degrees(math.atan2(- math.sin(angle), - math.cos(angle)))
 	angle = ((angle + 360) % 360)
@@ -158,7 +161,7 @@ def move(dir, mot):
 def main():
 	while True:
 		try:
-			mot = ard.init_motor()
+			mot, box = ard.connect_to()
 			if mot:
 				print("Connected to motors: " + str(mot))
 				print("==============================")

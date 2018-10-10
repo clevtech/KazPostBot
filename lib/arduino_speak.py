@@ -52,7 +52,6 @@ def open_doar(i, j, ser):
 		num = j + 4
 	ser.write(str(num).encode())
 	door = ser.readline().strip().decode("utf-8")
-	ser.close()
 
 
 def read_values():
