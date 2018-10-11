@@ -19,12 +19,12 @@ import datetime, socket
 
 
 app = Flask(__name__)  # Creating new flask app
-# while True:
-#     try:
-#         mot, box = ard.connect_to()
-#         break
-#     except:
-#         pass
+while True:
+    try:
+        mot, box = ard.connect_to()
+        break
+    except:
+        pass
 
 
 
@@ -209,14 +209,14 @@ def send():
             for j in range(len(passc[i])):
                 print("Checking " + str(i) + str(j))
                 if int(PIN) == int(passc[i][j]):
-                    # while 1:
-                    #     try:
-                    #         mot, box = ard.connect_to()
-                    #         break
-                    #     except:
-					
-                    #         pass
-                    # ard.open_doar(i, j, box)
+                    while 1:
+                        try:
+                            mot, box = ard.connect_to()
+                            break
+                        except:
+
+                            pass
+                    ard.open_doar(i, j, box)
                     msg = "Отдал посылку клиента: " + str(cell[i][j])
                     naboox.send_tlg_msg(msg, ids)
                     cell[i][j] = 0
