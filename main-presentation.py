@@ -151,6 +151,12 @@ def cellz(cellN):
     j = int(cellN[5])
 
     if request.method == 'POST':  # If user POST by clicking submit button any text
+        while True:
+            try:
+                mot, box = ard.connect_to()
+                break
+            except:
+                pass
         ard.open_doar(i, j, box)
         ID = request.form['id']
         file = "cells_ID.json"
@@ -186,19 +192,19 @@ def login():
 @app.route("/send/", methods=["GET", "POST"])
 def send():
     alert = "Введите пароль от посылки из СМС, и закройте крышку после себя, пожалуйста"
-    if check_time():
-        msg = "Поехал домой"
-        naboox.send_tlg_msg(msg, ids)
-    #     time.sleep(30)
-        # try:
-        #     motor.motion(mot, "A")
-        # except:
-        #     msg = "Что случилось по пути домой, не могу доехать"
-        #     naboox.send_tlg_msg(msg, ids)
-        # msg = "Я возле двери, впустите меня домой"
-        # naboox.send_tlg_msg(msg, ids)
-        return render_template(
-            "hello.html", **locals())
+    # if check_time():
+    #     msg = "Поехал домой"
+    #     naboox.send_tlg_msg(msg, ids)
+    # #     time.sleep(30)
+    #     # try:
+    #     #     motor.motion(mot, "A")
+    #     # except:
+    #     #     msg = "Что случилось по пути домой, не могу доехать"
+    #     #     naboox.send_tlg_msg(msg, ids)
+    #     # msg = "Я возле двери, впустите меня домой"
+    #     # naboox.send_tlg_msg(msg, ids)
+    #     return render_template(
+    #         "hello.html", **locals())
     if request.method == 'POST':  # If user POST by clicking submit button any text
         PIN = request.form['passcode']
         file = "cells_PIN.json"
@@ -224,7 +230,7 @@ def send():
                     value = "Открыто на 10 секунд"
                     exec("cell" + str(i) + str(j) + " = '" + value + "'")
                     return render_template(
-                        "pin2.html", **locals())
+                        "hello.html", **locals())
         msg = "Вводят неправильный пароль"
         naboox.send_tlg_msg(msg, ids)
         alert = "Неправильный пароль"
@@ -236,7 +242,7 @@ def send():
 @app.route("/sended/<i>/", methods=["GET", "POST"])
 def sended(i):
     if int(i) == 0:
-        naboox.write_json(time.time(), "start.json")
+        # naboox.write_json(time.time(), "start.json")
         # msg = "Я поехал доставлять посылки"
         # naboox.send_tlg_msg(msg, ids)
         time.sleep(10)
