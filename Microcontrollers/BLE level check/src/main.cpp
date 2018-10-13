@@ -21,7 +21,7 @@ void loop() {
   if(Serial.available() > 0){
     int Value = Serial.read();
     if (Value == 63){
-      Serial.println("R");
+      Serial.println("L");
     }
     else{
 

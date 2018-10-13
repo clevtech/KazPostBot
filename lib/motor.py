@@ -22,128 +22,121 @@ from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 
 
-calibration_angle = 0
-motion_time = 0
+
+def serial_ports():
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % (i + 1) for i in range(256)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/ttyUSB*')
+        print(ports)
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.usbmodem*')
+    else:
+        raise EnvironmentError('Unsupported platform')
+
+    result = ports
+    return result
 
 
-def get_ip():
-	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	try:
-		# doesn't even have to be reachable
-		s.connect(('10.255.255.255', 1))
-		IP = s.getsockname()[0]
-	except:
-		IP = '127.0.0.1'
-	finally:
-		s.close()
-	return IP
-
-
-def read_values():
-	while 1:
-		try:
-			fp2 = urllib.request.urlopen("http://" + str(get_ip())+":5000/ANGLE/")
-			mybytes2 = fp2.read()
-			mystr2 = mybytes2.decode("utf8")
-			print(mystr2)
-			fp2.close()
-			mystr2 = mystr2.split(".")[0]
-			print(mystr2)
-			angle = int(mystr2)
-			print("Angle is:")
-			print(angle)
-			return angle
-		except:
-			raise
-
-
-def turn(toAngle):
-	angle = read_values()
-	angle = math.radians(angle)
-	angle = math.degrees(math.atan2(- math.sin(angle), - math.cos(angle)))
-	global calibration_angle
-	angle = ((angle + 360) % 360) - calibration_angle
-	angle = toAngle - angle
-	if angle < 5 and angle > -5:
-		dir = "C"
-	elif angle < 0:
-		dir = "L"
-	else:
-		dir = "R"
-	return dir
+# types: Sonar - sonar arduino, Box - box controlling arduino
+# returns serial connection
+def connect_to():
+    arduinos = serial_ports()
+    print(arduinos)
+    ser = []
+    for i in range(len(arduinos)):
+        ser.append(serial.Serial(arduinos[i], 115200))
+        time.sleep(1)
+        ser[i].flush()
+        ser[i].write("?".encode())
+        # time.sleep(0.1)
+        types = ser[i].readline().strip().decode("utf-8")
+        print(types)
+        if types == "L":
+            left = ser[i]
+        if types == "R":
+            right = ser[i]
+    return left, right
 
 
 def check_kinect(mot):
 	print("Checking kinect")
-	start = 0
 	while 1:
-		check = kinect.motion()
-		break
-	if check != "G":
-		start = time.time()
+        try:
+    		check = kinect.motion()
+    		break
+        except:
+            pass
+	while check != "G":
+		print("Something on kinect")
 		move("S", mot)
 		time.sleep(10)
-	# while check != "G":
-	# 	print("Something on kinect")
-	# 	move("S", mot)
-	# 	time.sleep(10)
-	# 	check = kinect.motion()
-	while check != "G":
-		dir = check
-		print("Going to: " + str(dir))
-		if check != "G":
-			move("U", mot)
-			move(dir, mot)
 		check = kinect.motion()
-	move("S", mot)
-	now = time.time()
-	if start>0:
-		return float(now)-float(start)
-	else:
-		return 0
+	# while check != "G":
+	# 	dir = check
+	# 	print("Going to: " + str(dir))
+	# 	if check != "G":
+	# 		move("U", mot)
+	# 		move(dir, mot)
+	# 	check = kinect.motion()
 
 
-def motion(mot, point):
-	times, angle = take_points(point)
+def points1(phase):
+    BLES = ["12:3b:6a:1b:50:1a", "12:3b:6a:1b:4f:74"]
+    BACK = []
+    if phase = "A":
+        return BLES
+    else:
+        return BACK
+
+
+def direct(point, left, right):
+    addL, sigL = get_value(left)
+    addR, sigR = get_value(right)
+
+    for i in range(len(addL)):
+        if str(addL[i]) == str(point):
+            print("RSSI from L is: " + str(sigL[i]))
+            L = -sigL[i]
+    for i in range(len(addR)):
+        if str(addR[i]) == str(point):
+            print("RSSI from R is: " + str(sigR[i]))
+            R = -sigR[i]
+    if R < 60 or L < 60:
+        return "DONE"
+    try:
+        diff = L - R
+        if -3 > diff or diff > 3:
+            if R > L:
+                return "R"
+            if L > R:
+                return "L"
+    except:
+        return "S"
+
+
+def motion(mot, phase, left, right):
+    points = points1(phase)
 	move("S", mot)
 	move("L", mot)
 	move("R", mot)
-	calibrate()
-	for i in range(len(times)):
-		start = time.time()
-		now = time.time()
-		stopping = 0
-		while (now - start - stopping) < times[i]:
-			# stopping = stopping + float(check_kinect(mot))
+	for point in points:
+		while 1:
+            check_kinect(mot)
 			move("U", mot)
-			dir = turn(angle[i])
-		calibrate()
+			dir = direct(point, left, right)
+            if dir == "DONE":
+                break
+            else:
+                move(dir, mot)
 		move("S", mot)
 	return "Done"
 
 
-def calibrate():
-	angle = float(read_values())
-	angle = math.radians(angle)
-	angle = math.degrees(math.atan2(- math.sin(angle), - math.cos(angle)))
-	angle = ((angle + 360) % 360)
-	global calibration_angle
-	calibration_angle = angle
-	return "Done"
-
-
-def take_points(phase):
-	toAtime = [30, 25, 20]
-	toAangle = [0, 30, 40]
-	toBtime = [30, 80, 35]
-	toBangle = [170, 270, 270]
-	if phase == "A":
-		return [toAtime, toAangle]
-	else:
-		return [toBtime, toBangle]
-
-
 def move(dir, mot):
+    previous = "S"
+
 	if dir == "S":
 		ard.motion(mot, "S")
 	if dir == "U":
@@ -151,31 +144,41 @@ def move(dir, mot):
 	if dir == "D":
 		ard.motion(mot, "D")
 	if dir == "R":
-		ard.motion(mot, "R")
+        if previous == "L":
+            ard.motion(mot, "C")
+            ard.motion(mot, "R")
+        else:
+		    ard.motion(mot, "R")
 	if dir == "L":
-		ard.motion(mot, "L")
+        if previous == "R":
+            ard.motion(mot, "C")
+            ard.motion(mot, "L")
+        else:
+		    ard.motion(mot, "L")
 	if dir == "C":
 		ard.motion(mot, "C")
+
+    if dir == "R" or dir == "L" or dir == "C":
+        previous = dir
 
 
 def main():
 	while True:
 		try:
 			mot, box = ard.connect_to()
-			if mot:
-				print("Connected to motors: " + str(mot))
-				print("==============================")
-				break
+            left, right = connect_to()
+            if mot and box and left and right:
+			    break
 		except:
 			pass
 	print("Starting going to point A")
 	print("")
-	motion(mot, "A")
+	motion(mot, "A", left, right)
 	print("A is done")
 	time.sleep(30)
 	print("")
 	print("Starting going to point B")
-	motion(mot, "B")
+	motion(mot, "B", left, right)
 	print("Job is done, am I good girl?")
 
 
