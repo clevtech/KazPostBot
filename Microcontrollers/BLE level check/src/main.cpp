@@ -12,8 +12,8 @@
 
 
 int scanTime = 1; //In seconds
-const char* ssid     = "Expo2017";
-const char* password = "";
+const char* ssid     = "Aqbota";
+const char* password = "KazPostBot";
 
 
 
