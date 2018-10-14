@@ -111,3 +111,6 @@ def motion():
             if L > R:
                 print("Turn L")
         print()
+
+
+motion()

@@ -7,30 +7,33 @@
 #include <BLEUtils.h>
 #include <BLEScan.h>
 #include <BLEAdvertisedDevice.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 
 int scanTime = 1; //In seconds
+const char* ssid     = "Expo2017";
+const char* password = "";
+
 
 
 void setup() {
   Serial.begin(115200);
+  WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+}
 }
 
 
 void loop() {
-  if(Serial.available() > 0){
-    int Value = Serial.read();
-    if (Value == 63){
-      Serial.println("L");
-    }
-    else{
-
       BLEDevice::init("");
       BLEScan* pBLEScan = BLEDevice::getScan(); //create new scan
       pBLEScan->setActiveScan(true); //active scan uses more power, but get results faster
       BLEScanResults foundDevices = pBLEScan->start(scanTime);
       int count = foundDevices.getCount();
-
+      String message = "";
       for (int i = 0; i < count; i++)
                 {
                   BLEAdvertisedDevice d = foundDevices.getDevice(i);
@@ -40,10 +43,14 @@ void loop() {
                   }
                   // client.printf("Signal from: %s, level is: ", d.getAddress().toString());
                   // Serial.printf("Signal from: %s, level is: ", d.getAddress().toString());
-                  Serial.print("M:");Serial.print(mac);Serial.print(" S:");
-                  Serial.print(d.getRSSI()); Serial.print(";");
+                  message = message + "M:" + String(mac) + "S:" + String(d.getRSSI()) + ";";
                 }
       Serial.println();
-    }
-    }
+
+
+HTTPClient http;
+http.begin("http://192.168.8.100:7777/data/right/" + message); //Specify destination for HTTP request
+http.addHeader("Content-Type", "text/plain"); //Specify content-type header
+int httpResponseCode = http.GET(); //Send the actual POST request
+http.end(); //Free resources
 }
