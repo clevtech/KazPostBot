@@ -22,44 +22,6 @@ from gevent import pywsgi
 from geventwebsocket.handler import WebSocketHandler
 
 
-
-def serial_ports():
-    if sys.platform.startswith('win'):
-        ports = ['COM%s' % (i + 1) for i in range(256)]
-    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-        # this excludes your current terminal "/dev/tty"
-        ports = glob.glob('/dev/ttyUSB*')
-        print(ports)
-    elif sys.platform.startswith('darwin'):
-        ports = glob.glob('/dev/tty.usbmodem*')
-    else:
-        raise EnvironmentError('Unsupported platform')
-
-    result = ports
-    return result
-
-
-# types: Sonar - sonar arduino, Box - box controlling arduino
-# returns serial connection
-def connect_to():
-    arduinos = serial_ports()
-    print(arduinos)
-    ser = []
-    for i in range(len(arduinos)):
-        ser.append(serial.Serial(arduinos[i], 115200))
-        time.sleep(1)
-        ser[i].flush()
-        ser[i].write("?".encode())
-        # time.sleep(0.1)
-        types = ser[i].readline().strip().decode("utf-8")
-        print(types)
-        if types == "L":
-            left = ser[i]
-        if types == "R":
-            right = ser[i]
-    return left, right
-
-
 def check_kinect(mot):
 	print("Checking kinect")
 	while 1:
@@ -91,19 +53,26 @@ def points1(phase):
         return BACK
 
 
-def direct(point, left, right):
-    addL, sigL = get_value(left)
-    addR, sigR = get_value(right)
+def get_value(point):
+    global Lstr
+    global Rstr
+    rawL = Lstr.split(";")[:-1]
+    rawR = Rstr.split(";")[:-1]
+    for each in rawL:
+        add = str(each.split("M:")[1].split("S:")[0])
+        if str(add).lowercase() == str(point).lowercase():
+            L = int(each.split("S:")[1])
+            break
+    for each in rawR:
+        add = str(each.split("M:")[1].split("S:")[0])
+        if str(add).lowercase() == str(point).lowercase():
+            R = int(each.split("S:")[1])
+            break
+    return L, R
 
-    for i in range(len(addL)):
-        if str(addL[i]) == str(point):
-            print("RSSI from L is: " + str(sigL[i]))
-            L = -sigL[i]
-    for i in range(len(addR)):
-        if str(addR[i]) == str(point):
-            print("RSSI from R is: " + str(sigR[i]))
-            R = -sigR[i]
-    if R < 60 or L < 60:
+def direct(point):
+    L, R = get_value(point)
+    if R > -60 and L > -60:
         return "DONE"
     try:
         diff = L - R
@@ -116,7 +85,7 @@ def direct(point, left, right):
         return "S"
 
 
-def motion(mot, phase, left, right):
+def motion(mot, phase):
     points = points1(phase)
 	move("S", mot)
 	move("L", mot)
@@ -125,7 +94,7 @@ def motion(mot, phase, left, right):
 		while 1:
             check_kinect(mot)
 			move("U", mot)
-			dir = direct(point, left, right)
+			dir = direct(point)
             if dir == "DONE":
                 break
             else:
@@ -166,19 +135,18 @@ def main():
 	while True:
 		try:
 			mot, box = ard.connect_to()
-            left, right = connect_to()
             if mot and box and left and right:
 			    break
 		except:
 			pass
 	print("Starting going to point A")
 	print("")
-	motion(mot, "A", left, right)
+	motion(mot, "A")
 	print("A is done")
 	time.sleep(30)
 	print("")
 	print("Starting going to point B")
-	motion(mot, "B", left, right)
+	motion(mot, "B")
 	print("Job is done, am I good girl?")
 
 
