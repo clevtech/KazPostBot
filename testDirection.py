@@ -62,3 +62,4 @@ def main2():
 if __name__=="__main__":
     while 1:
         main()
+#    scanLE(0, [])
