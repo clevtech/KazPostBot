@@ -15,7 +15,7 @@
 #define RS A4
 #define CS A5
 
-#define d 200
+#define d 300
 
 // Sonar values
 Ultrasonic ultrasonicR(13, 12);
@@ -41,7 +41,7 @@ void turn_left() {
       del = d;
     }
     else{
-      del = 3*d;
+      del = 2*d;
     }
     digitalWrite(L, LOW);
     int i = 0;
@@ -50,7 +50,7 @@ void turn_left() {
       i = i + 1;
     }
     digitalWrite(L, HIGH);
-    Serial.println(i);
+    //Serial.println(i);
     turn = 0;
   }
 }
@@ -63,7 +63,7 @@ void turn_right() {
       del = d;
     }
     else{
-      del = 3*d;
+      del = 2*d;
     }
     digitalWrite(R, LOW);
     int i = 0;
@@ -72,32 +72,35 @@ void turn_right() {
       i = i + 1;
     }
     digitalWrite(R, HIGH);
-    Serial.println(i);
+    //Serial.println(i);
     turn = 2;
   }
 }
 
 // Done
 void turn_center() {
+  analogWrite(RS, 1024);
   int i = 0;
   if(turn == 0){
     digitalWrite(R, LOW);
-    while(analogRead(CS) > 1 and i < d){
+    while(analogRead(RS) > 24 and i < d){
       delay(1);
       i = i + 1;
+      analogWrite(RS, 1024);
     }
     digitalWrite(R, HIGH);
-    Serial.println(i);
+    //Serial.println(i);
     turn = 1;
   }
   else if(turn == 2){
     digitalWrite(L, LOW);
-    while(analogRead(CS) > 1 and i < d){
+    while(analogRead(RS) > 25 and i < d){
       delay(1);
       i = i + 1;
+      analogWrite(RS, 1024);
     }
     digitalWrite(L, HIGH);
-    Serial.println(i);
+    //Serial.println(i);
     turn = 1;
   }
   else if(turn == 1){
@@ -155,6 +158,8 @@ void loop() {
     int Value = Serial.read();
     if (Value == 63){
       Serial.println("MOT");
+      analogWrite(RS, 1024);
+
     }
     else{
                 tackle();
