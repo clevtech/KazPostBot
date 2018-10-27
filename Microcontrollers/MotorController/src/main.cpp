@@ -186,9 +186,6 @@ void loop() {
 
                 tackle();
               }
-      }
-      else{
-        STOP();
-        turn_center();
+
       }
 }
