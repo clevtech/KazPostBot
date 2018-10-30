@@ -58,7 +58,7 @@ def main():
     pygame.display.set_caption("Cleverest Technologies")
 
     screen.fill((255, 255, 255))
-    conn = socket_start()
+    conn = mot_start()
 
 
     # Allowing the user to close the window...
