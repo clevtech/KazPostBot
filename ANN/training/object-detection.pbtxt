@@ -1,0 +1,20 @@
+item {
+  id: 1
+  name: 'ilmalione'
+}
+item {
+  id: 2
+  name: 'mega'
+}
+item {
+  id: 3
+  name: 'kassa'
+}
+item {
+  id: 4
+  name: 'kebab'
+}
+item {
+  id: 5
+  name: 'pivo'
+}

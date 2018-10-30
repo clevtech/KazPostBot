@@ -40,9 +40,26 @@ def connect_to():
 		print(types)
 		if types == "MOT":
 			mot = ser[i]
+		# if types == "Box":
+		# 	box = ser[i]
+	return mot
+
+def connect_to_box():
+	arduinos = serial_ports()
+	print(arduinos)
+	ser = []
+	for i in range(len(arduinos)):
+		ser.append(serial.Serial(arduinos[i], 115200))
+		time.sleep(1)
+		ser[i].write("?".encode())
+		# time.sleep(0.1)
+		types = ser[i].readline().strip().decode("utf-8")
+		print(types)
 		if types == "Box":
 			box = ser[i]
-	return mot, box
+		# if types == "Box":
+		# 	box = ser[i]
+	return box
 
 
 def open_doar(i, j, ser):

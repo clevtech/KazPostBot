@@ -40,3 +40,7 @@ def motion():
 	else:
 		print("Continue movement")
 		return("G")
+
+
+if __name__ == "__main__":
+    motion()

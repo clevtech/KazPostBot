@@ -21,7 +21,8 @@ import datetime, socket
 app = Flask(__name__)  # Creating new flask app
 while True:
     try:
-        mot, box = ard.connect_to()
+        mot = ard.connect_to()
+        box = ard.connect_to_box()
         break
     except:
         pass
