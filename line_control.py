@@ -30,4 +30,6 @@ def main():
             send_to_bot(mot, "R")
         elif dir == "a":
             send_to_bot(mot, "L")
+        elif dir == "r":
+            send_to_bot(mot, "C")
         time.sleep(0.1)
