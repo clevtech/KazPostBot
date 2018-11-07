@@ -154,7 +154,7 @@ def cellz(cellN):
     if request.method == 'POST':  # If user POST by clicking submit button any text
         while True:
             try:
-                mot, box = ard.connect_to()
+                box = ard.connect_to_box()
                 break
             except:
                 pass
@@ -216,13 +216,7 @@ def send():
             for j in range(len(passc[i])):
                 print("Checking " + str(i) + str(j))
                 if int(PIN) == int(passc[i][j]):
-                    while 1:
-                        try:
-                            mot, box = ard.connect_to()
-                            break
-                        except:
-
-                            pass
+                    
                     ard.open_doar(i, j, box)
                     msg = "Отдал посылку клиента: " + str(cell[i][j])
                     naboox.send_tlg_msg(msg, ids)
@@ -266,4 +260,4 @@ if __name__ == "__main__":
     id, passcode4, timer4 = read_config()
     msg = "Я включился, мой IP: " + str(naboox.get_ip())
     naboox.send_tlg_msg(msg, id)
-    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    app.run(host="0.0.0.0", port=7777, debug=True)
