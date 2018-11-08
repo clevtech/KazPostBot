@@ -14,18 +14,18 @@ import lib.main as naboox
 # import lib.motor as motor
 import random
 import smsgate
-import lib.arduino_speak as ard
+# import lib.arduino_speak as ard
 import datetime, socket
 
 
 app = Flask(__name__)  # Creating new flask app
-while True:
-    try:
-        mot = ard.connect_to()
-        box = ard.connect_to_box()
-        break
-    except:
-        pass
+# while True:
+#     try:
+#         mot = ard.connect_to()
+#         box = ard.connect_to_box()
+#         break
+#     except:
+#         pass
 
 
 
@@ -78,29 +78,29 @@ def robcont():
     return render_template("robot-control.html")
 
 
-@app.route('/robot-control/<direction>', methods=['POST'])
-def ajax_request(direction):
-    print(str(direction))
-    direction = str(direction).replace("\n", '').replace("\r", '').replace("/", "")
-    if direction == "u-p":
-        ard.motion(mot, "U")
-        print("Up is pressed")
-    elif direction == "d-p":
-        ard.motion(mot, "D")
-    elif direction == "r-p":
-        ard.motion(mot, "R")
-    elif direction == "l-p":
-        ard.motion(mot, "L")
-
-    elif direction == "u-r":
-        ard.motion(mot, "S")
-    elif direction == "d-r":
-        ard.motion(mot, "S")
-    elif direction == "r-r":
-        ard.motion(mot, "C")
-    elif direction == "l-r":
-        ard.motion(mot, "C")
-    return jsonify()
+# @app.route('/robot-control/<direction>', methods=['POST'])
+# def ajax_request(direction):
+#     print(str(direction))
+#     direction = str(direction).replace("\n", '').replace("\r", '').replace("/", "")
+#     if direction == "u-p":
+#         ard.motion(mot, "U")
+#         print("Up is pressed")
+#     elif direction == "d-p":
+#         ard.motion(mot, "D")
+#     elif direction == "r-p":
+#         ard.motion(mot, "R")
+#     elif direction == "l-p":
+#         ard.motion(mot, "L")
+#
+#     elif direction == "u-r":
+#         ard.motion(mot, "S")
+#     elif direction == "d-r":
+#         ard.motion(mot, "S")
+#     elif direction == "r-r":
+#         ard.motion(mot, "C")
+#     elif direction == "l-r":
+#         ard.motion(mot, "C")
+#     return jsonify()
 
 
 # Hello page
@@ -152,13 +152,13 @@ def cellz(cellN):
     j = int(cellN[5])
 
     if request.method == 'POST':  # If user POST by clicking submit button any text
-        while True:
-            try:
-                box = ard.connect_to_box()
-                break
-            except:
-                pass
-        ard.open_doar(i, j, box)
+        # while True:
+        #     try:
+        #         mot, box = ard.connect_to()
+        #         break
+        #     except:
+        #         pass
+        # ard.open_doar(i, j, box)
         ID = request.form['id']
         file = "cells_ID.json"
         data = naboox.read_json(file)
@@ -216,13 +216,14 @@ def send():
             for j in range(len(passc[i])):
                 print("Checking " + str(i) + str(j))
                 if int(PIN) == int(passc[i][j]):
-                    while True:
-                        try:
-                            box = ard.connect_to_box()
-                            break
-                        except:
-                            pass
-                    ard.open_doar(i, j, box)
+                    # while 1:
+                    #     try:
+                    #         mot, box = ard.connect_to()
+                    #         break
+                    #     except:
+                    #
+                    #         pass
+                    # ard.open_doar(i, j, box)
                     msg = "Отдал посылку клиента: " + str(cell[i][j])
                     naboox.send_tlg_msg(msg, ids)
                     cell[i][j] = 0
@@ -271,6 +272,7 @@ def sended(i):
         # naboox.write_json(time.time(), "start.json")
         msg = "Я поехал доставлять посылки"
         naboox.send_tlg_msg(msg, ids)
+        time.sleep(10)
         x = input("Доехал?")
         smsgate.send("real")
         msg = "Я приехал на АстанаХаб"
