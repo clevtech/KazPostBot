@@ -14,7 +14,7 @@ import lib.main as naboox
 # import lib.motor as motor
 import random
 import smsgate
-import lib.arduino_speak as ard
+# import lib.arduino_speak as ard
 import datetime, socket
 
 
@@ -152,7 +152,7 @@ def cellz(cellN):
     j = int(cellN[5])
 
     if request.method == 'POST':  # If user POST by clicking submit button any text
-        while True:
+        while 1:
             try:
                 box = ard.connect_to_box()
                 break
@@ -216,7 +216,7 @@ def send():
             for j in range(len(passc[i])):
                 print("Checking " + str(i) + str(j))
                 if int(PIN) == int(passc[i][j]):
-                    while True:
+                    while 1:
                         try:
                             box = ard.connect_to_box()
                             break
@@ -271,6 +271,7 @@ def sended(i):
         # naboox.write_json(time.time(), "start.json")
         msg = "Я поехал доставлять посылки"
         naboox.send_tlg_msg(msg, ids)
+        time.sleep(10)
         x = input("Доехал?")
         smsgate.send("real")
         msg = "Я приехал на АстанаХаб"
