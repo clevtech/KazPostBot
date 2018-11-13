@@ -11,10 +11,10 @@ __status__ = "Development"
 from flask import Flask, render_template, request, Markup, jsonify
 import time
 import lib.main as naboox
-# import lib.motor as motor
+import lib.motor as motor
 import random
 import smsgate
-# import lib.arduino_speak as ard
+import lib.arduino_speak as ard
 import datetime, socket
 
 
@@ -287,4 +287,4 @@ if __name__ == "__main__":
     id, passcode4, timer4 = read_config()
     msg = "Я включился, мой IP: " + str(naboox.get_ip())
     naboox.send_tlg_msg(msg, id)
-    app.run(host=naboox.get_ip(), port=7777, debug=True)
+    app.run("0.0.0.0", port=7777, debug=True)
