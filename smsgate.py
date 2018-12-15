@@ -35,7 +35,6 @@ def send(type = "test"):
         tail = req.split("<!--body-->")[2]
 
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    # naboox.write_json(datetime.datetime.now().timestamp(), "start.json")
 
     body = []
     print(IDs)
@@ -56,9 +55,6 @@ def send(type = "test"):
     pretyy = xml.dom.minidom.parseString(response.content)
     pretty_xml_as_string = pretyy.toprettyxml()
     print(pretty_xml_as_string)
-    # with open("log.txt", "r") as file:
-    #     file.write(pretty_xml_as_string)
-    #     file.write(str(datetime.datetime.now()))
     return 1
 
 

@@ -1,0 +1,20 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.service.ibank.modules.colvir.com/" xmlns:sup="http://colvir.com/modules/ibank/service/data/support">
+   <soapenv:Header>
+      <ws:header>
+         <sup:params>
+            <sup:clientType>KZPOST</sup:clientType>
+            <sup:interfaceVersion>1.0</sup:interfaceVersion>
+            <sup:language>ru</sup:language>
+            <sup:operationalDate>2013-12-13</sup:operationalDate>
+            <sup:clientTimeout>60</sup:clientTimeout>
+         </sup:params>
+     </ws:header>
+   </soapenv:Header>
+   <soapenv:Body>
+      <ws:PostomatDLVRPOWithdraw>
+        <barCode>KZ123456789KZ</barCode>
+         <postomatCode>901104</postomatCode>
+         <userCode>COLVIR</userCode>
+      </ws:PostomatDLVRPOWithdraw>
+   </soapenv:Body>
+</soapenv:Envelope>

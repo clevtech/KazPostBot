@@ -1,0 +1,3 @@
+ШПИ: KZ734782345KZ
+Индекс: 901104
+Веб: http://pls-test.post.kz/api/service/postamat?wsdl
